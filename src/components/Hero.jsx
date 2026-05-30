@@ -1,0 +1,76 @@
+"use client";
+
+
+import Image from "next/image";
+
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaTimes,
+  FaEnvelope,
+  FaLock,
+  FaUser,
+} from "react-icons/fa";
+
+
+const MotionImage = motion(Image);
+
+export default function Hero() {
+  return (
+    <section id="about" className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white overflow-hidden">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6 p-10">
+      <div className="max-w-7xl mx-auto text-justify px-6">
+
+        <motion.h1
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="text-3xl md:text-3xl font-bold"
+        >
+          Build Future With Sharma Technologies
+        </motion.h1>
+
+        <p className="mt-3 text-md md:text-xl">
+          Custom Software • Web Development • IoT Systems • AI Solutions
+        </p>
+        <motion.button
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+         className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
+          Get Started
+        </motion.button>
+      
+
+      </div>
+      <div className="max-w-7xl mx-auto text-center px-6">
+        <MotionImage
+          src="/images/service.png"
+          alt="Service"
+          width={600}
+          height={400}
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        />
+      </div>
+    </div>
+  {/* Bottom Curve */}
+      <div className="absolute bottom-0 left-0 w-full">        
+        <svg
+          viewBox="0 0 1430 220"
+          className="w-full h-56"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ffffff81"
+            d="M0,192L80,202.7C160,213,320,235,480,229.3C640,224,800,192,960,176C1120,160,1280,160,1360,160L1440,160L1440,320L0,320Z"
+          />
+        </svg>
+      </div>
+
+    </section>
+
+    
+  );
+}
