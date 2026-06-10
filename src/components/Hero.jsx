@@ -43,15 +43,21 @@ export default function Hero() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.7 }}
         >is a software development company specializing in innovative web applications, mobile applications, enterprise software solutions, cloud computing, IoT systems, and digital transformation services. We help businesses improve efficiency, enhance customer experiences, and achieve growth through modern technology solutions.</motion.p>
-        <a href="#services">
+        
         <motion.button
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
+          onClick={() => {
+              const servicesSection = document.getElementById("services");
+              servicesSection?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }}
           className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
           Get Started
-        </motion.button>
-      </a>
+        </motion.button>    
 
       </div>
       <div className="max-w-7xl mx-auto text-center px-6">
