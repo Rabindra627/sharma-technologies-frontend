@@ -4,6 +4,7 @@
 import Image from "next/image";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { FaArrowRight } from "react-icons/fa";
 import {
   FaTimes,
   FaEnvelope,
@@ -44,20 +45,32 @@ export default function Hero() {
           transition={{ delay: 0.6, duration: 0.7 }}
         >is a software development company specializing in innovative web applications, mobile applications, enterprise software solutions, cloud computing, IoT systems, and digital transformation services. We help businesses improve efficiency, enhance customer experiences, and achieve growth through modern technology solutions.</motion.p>
         
-        <motion.button
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          onClick={() => {
-              const servicesSection = document.getElementById("services");
-              servicesSection?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }}
-          className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
-          Get Started
-        </motion.button>    
+     <motion.button
+  whileHover={{ scale: 1.08, y: -4 }}
+  whileTap={{ scale: 0.95 }}
+  onClick={() => {
+    document.getElementById("services")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }}
+  className="
+    mt-8 flex items-center gap-2
+    bg-white/10 backdrop-blur-md
+    border border-white/30
+    text-white
+    px-8 py-3
+    rounded-full
+    font-semibold
+    shadow-lg
+    hover:bg-white
+    hover:text-blue-600
+    hover:border-white
+    transition-all duration-300
+  "
+>
+  Get Started
+  <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+</motion.button>
 
       </div>
       <div className="max-w-7xl mx-auto text-center px-6">
