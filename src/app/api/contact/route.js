@@ -5,17 +5,15 @@ import nodemailer from "nodemailer";
 export async function POST(req) {
   try {
     const { name, email, message } = await req.json();
-    console.log(email);
+
     await connectDB();
 
-    // Save in database
-    await Contact.create({
+    const contact = await Contact.create({
       name,
       email,
       message,
     });
 
-    // Send Email
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -25,26 +23,36 @@ export async function POST(req) {
     });
 
     await transporter.sendMail({
-      from: email,
+      from: process.env.EMAIL_USER,
+      replyTo: email,
       to: "rabindra.onlinework@gmail.com",
-      subject: "New Contact Message",
+      subject: `New Contact Message from ${name}`,
       html: `
         <h2>New Contact Form Message</h2>
         <p><b>Name:</b> ${name}</p>
         <p><b>Email:</b> ${email}</p>
-        <p><b>Message:</b> ${message}</p>
+        <p><b>Message:</b></p>
+        <p>${message}</p>
       `,
     });
 
-    return Response.json({
-      success: true,
-      message: "Message sent successfully",
-    });
-
+    return Response.json(
+      {
+        success: true,
+        data: contact,
+        message: "Message sent successfully",
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    return Response.json({
-      success: false,
-      message: "Something went wrong",
-    });
+    console.error(error);
+
+    return Response.json(
+      {
+        success: false,
+        message: error.message,
+      },
+      { status: 500 }
+    );
   }
 }
