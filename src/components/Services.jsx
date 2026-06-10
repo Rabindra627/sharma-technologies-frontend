@@ -56,7 +56,7 @@ className="py-24 bg-gray-100"
 
 <div className="max-w-7xl mx-auto px-6">
 
-<h2 className="text-4xl font-bold text-center">
+<h2 className="text-4xl md:text-4xl font-bold text-center text-blue-400">
 Our Services
 </h2>
 

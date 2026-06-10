@@ -44,7 +44,7 @@ export default function Portfolio() {
   return (
     <section className="py-20 bg-white" id="portfolio">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-bold text-center">Our Portfolio</h2>
+        <h2 className="text-4xl md:text-4xl font-bold text-center text-blue-400">Our Portfolio</h2>
 
         <motion.div
           ref={carouselRef}

@@ -15,8 +15,11 @@ import {
 export default function Navbar ()  {  
   
   const [scrolled, setScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
+  // const [isOpen, setIsOpen] = useState(false);
+  // const [isLogin, setIsLogin] = useState(true);
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -43,7 +46,7 @@ export default function Navbar ()  {
   const validate = () => {
     let newErrors = {};
 
-    if (!isLogin && !form.name.trim()) {
+    if (!modalOpen && !form.name.trim()) {
       newErrors.name = "Name is required";
     }
 
@@ -77,7 +80,7 @@ export default function Navbar ()  {
     }
 
     alert(
-      isLogin
+      modalOpen
         ? "Login Successful"
         : "Signup Successful"
     );
@@ -88,7 +91,7 @@ export default function Navbar ()  {
       password: "",
     });
 
-    setIsOpen(false);
+    setMobileMenuOpen(false);
   };
 
   // Navigation items array
@@ -116,7 +119,7 @@ export default function Navbar ()  {
     const target = document.querySelector(href);
     if (target) {
       target.scrollIntoView({ behavior: "smooth" });
-      setIsOpen(false);
+      setMobileMenuOpen(false);
     }
   };
 
@@ -157,35 +160,35 @@ export default function Navbar ()  {
             </li>
           ))}
           <li>
-            <button
-  onClick={() => setIsOpen(true)}
-  className={` 
-    ${scrolled ? 'text-black rounded-full shadow-md border-2 px-6 py-2 border-gray-400 hover:text-blue-600' : 'border-2 border-white text-white hover:bg-cyan-400 hover:text-white px-6 py-3  rounded-full shadow-md  font-semibold transition-all duration-300  hover:shadow-cyan-400/40'}
-  `}
->
-  Login / Signup
-</button>
+          <button
+              onClick={() => setModalOpen(true)}
+              className={` 
+              ${scrolled ? 'text-black rounded-full shadow-md border-2 px-6 py-2 border-gray-400 hover:text-blue-600' : 'border-2 border-white text-white hover:bg-cyan-400 hover:text-white px-6 py-3  rounded-full shadow-md  font-semibold transition-all duration-300  hover:shadow-cyan-400/40'}
+          `}
+          >
+            Login / Signup
+          </button>
           </li>
         </ul>
 
         {/* Mobile Hamburger */}
         <div
           className="md:hidden flex flex-col space-y-1 cursor-pointer"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           <span
             className={`block w-6 h-0.5 bg-gray-700 transition-transform duration-300 ${
-              isOpen ? "rotate-45 translate-y-2" : ""
+              mobileMenuOpen ? "rotate-45 translate-y-2" : ""
             }`}
           ></span>
           <span
             className={`block w-6 h-0.5 bg-gray-700 transition-opacity duration-300 ${
-              isOpen ? "opacity-0" : "opacity-100"
+              mobileMenuOpen ? "opacity-0" : "opacity-100"
             }`}
           ></span>
           <span
             className={`block w-6 h-0.5 bg-gray-700 transition-transform duration-300 ${
-              isOpen ? "-rotate-45 -translate-y-2" : ""
+              mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
             }`}
           ></span>
         </div>
@@ -194,7 +197,7 @@ export default function Navbar ()  {
       {/* Mobile Menu */}
       <div
         className={`md:hidden bg-white shadow-lg transition-all duration-500 overflow-hidden ${
-          isOpen ? "max-h-60 py-4" : "max-h-0"
+          mobileMenuOpen ? "max-h-60 py-4" : "max-h-0"
         }`}
       >
         <ul className="flex flex-col space-y-3 px-6 text-gray-700 font-medium">
@@ -210,7 +213,7 @@ export default function Navbar ()  {
         </ul>
       </div>
       <AnimatePresence>
-        {isOpen && (
+        {modalOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -227,7 +230,7 @@ export default function Navbar ()  {
             >
               {/* Close */}
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => setModalOpen(false)}
                 className="absolute top-5 right-5 text-gray-500 hover:text-red-500 transition"
               >
                 <FaTimes size={20} />
@@ -236,11 +239,11 @@ export default function Navbar ()  {
               {/* Header */}
               <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-center py-8 px-6">
                 <h2 className="text-3xl font-bold">
-                  {isLogin ? "Welcome Back" : "Create Account"}
+                  {modalOpen ? "Welcome Back" : "Create Account"}
                 </h2>
 
                 <p className="text-sm mt-2 text-cyan-100">
-                  {isLogin
+                  {modalOpen
                     ? "Login to continue"
                     : "Sign up to get started"}
                 </p>
@@ -253,7 +256,7 @@ export default function Navbar ()  {
                   className="space-y-5"
                 >
                   {/* Name */}
-                  {!isLogin && (
+                  {!modalOpen && (
                     <div>
                       <div className="flex items-center border rounded-2xl px-4 py-3 bg-gray-50">
                         <FaUser className="text-gray-400 mr-3" />
@@ -325,24 +328,24 @@ export default function Navbar ()  {
                     type="submit"
                     className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-400/40"
                   >
-                    {isLogin ? "Login" : "Create Account"}
+                    {modalOpen ? "Login" : "Create Account"}
                   </button>
                 </form>
 
                 {/* Toggle */}
                 <div className="text-center mt-6 text-gray-600">
-                  {isLogin
+                  {modalOpen
                     ? "Don't have an account?"
                     : "Already have an account?"}
 
                   <button
                     onClick={() => {
-                      setIsLogin(!isLogin);
+                      setMobileMenuOpen(!modalOpen);
                       setErrors({});
                     }}
                     className="ml-2 text-cyan-600 font-semibold hover:underline"
                   >
-                    {isLogin ? "Sign Up" : "Login"}
+                    {modalOpen ? "Sign Up" : "Login"}
                   </button>
                 </div>
               </div>

@@ -30,9 +30,14 @@ const blogs = [
 export default function BlogsSection() {
   return (
     <section id="blog" className="py-16 px-5 md:px-16 bg-gray-50 dark:bg-gray-900">
-      <h1 className="text-3xl font-bold text-center mb-10 text-gray-900 dark:text-white">
+      <motion.h1
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileInView={{opacity: 1, y: 1}}
+          transition={{ duration: 0.7 , delay: 0.2}}
+        className="text-3xl font-bold text-center mb-10 dark:text-white text-blue-400">
         Latest Blogs
-      </h1>
+      </motion.h1>
       <motion.div
         initial="hidden"
         whileInView="visible"

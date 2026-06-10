@@ -22,22 +22,32 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto text-justify px-6">
 
         <motion.h1
-          initial={{ opacity: 0, y: -50 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-3xl md:text-3xl font-bold"
+          whileInView={{opacity: 1, y: 1}}
+          transition={{ duration: 0.7 , delay: 0.2}}
+          className="text-3xl md:text-3xl font-bold sm:py-20"
         >
           Build Future With Sharma Technologies
         </motion.h1>
 
-        <p className="mt-3 text-md md:text-xl">
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+        className="mt-3 text-md md:text-xl">
           Custom Software • Web Development • IoT Systems • AI Solutions
-        </p>
+        </motion.p>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.7 }}
+        >is a software development company specializing in innovative web applications, mobile applications, enterprise software solutions, cloud computing, IoT systems, and digital transformation services. We help businesses improve efficiency, enhance customer experiences, and achieve growth through modern technology solutions.</motion.p>
         <motion.button
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-         className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
+          className="mt-8 bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
           Get Started
         </motion.button>
       
@@ -51,7 +61,7 @@ export default function Hero() {
           height={400}
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 1 , delay : 0.6}}
         />
       </div>
     </div>

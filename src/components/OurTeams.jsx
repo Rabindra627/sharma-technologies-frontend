@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { FaLinkedin, FaGithub, FaTwitter } from "react-icons/fa";
+import { FaLinkedin, FaGithub, FaTwitter, FaFacebook } from "react-icons/fa";
 
 const teamMembers = [
   {
@@ -11,9 +11,10 @@ const teamMembers = [
     image: "/images/team/founder.png",
     description:
       "As the founder, Rabindra is the visionary and strategic leader of Sharma Technologies. Based out of Janakpur, Nepal, he is responsible for establishing the company's direction, managing the core team, and driving digital innovation for businesses worldwide.",
-    linkedin: "#",
-    github: "#",
+    linkedin: "https://www.linkedin.com/in/rabindra-sharma-3b46a7189",
+    github: "https://github.com/RabindraSharma?tab=repositories",
     twitter: "#",
+    facebook : "https://www.facebook.com/profile.php?id=100006317468529"
   },
   {
     name: "Birendra Thakur",
@@ -55,7 +56,7 @@ export default function OurTeamPage() {
           initial={{ opacity: 0, y: -40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="text-4xl md:text-6xl font-bold mb-6"
+          className="text-4xl md:text-4xl font-bold mb-6 text-blue-400"
         >
           Meet Our Team
         </motion.h1>
@@ -119,6 +120,13 @@ export default function OurTeamPage() {
                     className="hover:text-cyan-400 transition"
                   >
                     <FaTwitter />
+                  </a>                  
+                  <a
+                  href={member.facebook}
+                  target="_blank"
+                  className="hover:text-cyan-400 transition"
+                  >
+                  <FaFacebook/>  
                   </a>
                 </div>
               </div>
