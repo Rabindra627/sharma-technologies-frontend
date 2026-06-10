@@ -19,7 +19,7 @@ export default function Hero() {
   return (
     <section id="about" className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white overflow-hidden">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-6 p-10">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-16 px-6 sm:px-8 lg:px-12 py-20">
       <div className="max-w-7xl mx-auto text-justify px-6">
 
         <motion.h1
@@ -27,15 +27,19 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           whileInView={{opacity: 1, y: 1}}
           transition={{ duration: 0.7 , delay: 0.2}}
-          className="text-3xl md:text-3xl font-bold sm:py-20"
+          className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight"
         >
           Build Future With Sharma Technologies
         </motion.h1>
 
         <motion.p 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.7 }}
+          viewport={{ once: true }}
+          transition={{
+            duration: 0.8,
+            ease: "easeOut",
+          }}
         className="mt-3 text-md md:text-xl">
           Custom Software • Web Development • IoT Systems • AI Solutions
         </motion.p>
@@ -64,8 +68,10 @@ export default function Hero() {
         <MotionImage
           src="/images/service.png"
           alt="Service"
-          width={600}
-          height={400}
+          width={700}
+          height={700}
+          priority
+          className="w-full h-auto max-w-[650px] mx-auto drop-shadow-2xl"
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 , delay : 0.6}}

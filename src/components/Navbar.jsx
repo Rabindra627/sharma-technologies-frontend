@@ -16,9 +16,7 @@ import { useRouter } from "next/navigation";
 export default function Navbar ()  {  
   
   const [scrolled, setScrolled] = useState(false);
-  // const [isOpen, setIsOpen] = useState(false);
-  // const [isLogin, setIsLogin] = useState(true);
-
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -125,7 +123,7 @@ export default function Navbar ()  {
   // Navigation items array
   const menuItems = [
     // { name: "Home", href: "#home" },
-    { name: "About", href: "#about" },
+    // { name: "About", href: "#about" },
     { name: "Services", href: "#services" },
     { name: "Portfolio", href: "#portfolio" },
     { name: "Blog", href: "#blog" },
@@ -238,6 +236,17 @@ export default function Navbar ()  {
               {item.name}
             </li>
           ))}
+          <li>
+          <button
+              onClick={() => setModalOpen(true)}
+              className={` 
+              ${scrolled ? 'text-black rounded-full shadow-md border-2 px-6 py-2 border-gray-400 hover:text-blue-600' : 'border-2 border-white text-white hover:bg-cyan-400 hover:text-white px-6 py-3  rounded-full shadow-md  font-semibold transition-all duration-300  hover:shadow-cyan-400/40'}
+          `}
+          >
+            Login / Signup
+          </button>
+          </li>
+
         </ul>
       </div>
       <AnimatePresence>

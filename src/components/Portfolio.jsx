@@ -42,13 +42,13 @@ export default function Portfolio() {
   };
 
   return (
-    <section className="py-20 bg-white" id="portfolio">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-20 bg-white p-4" id="portfolio">
+      <div className="max-w-7xl mx-auto px-6 p-4">
         <h2 className="text-4xl md:text-4xl font-bold text-center text-blue-400">Our Portfolio</h2>
 
         <motion.div
           ref={carouselRef}
-          className="mt-12 overflow-hidden flex gap-6 cursor-default"
+          className="mt-12 overflow-hidden flex gap-6 cursor-default p-4"
         >
           {projects.concat(projects).map((project, index) => ( // duplicate for smooth loop
             <motion.div
@@ -57,7 +57,7 @@ export default function Portfolio() {
               initial="hidden"
               animate="show"
               whileHover={{ scale: 1.05 }}
-              className="min-w-[250px] md:min-w-[280px] bg-white shadow-lg rounded-xl overflow-hidden flex-shrink-0"
+              className="min-w-[250px] md:min-w-[280px] p-2 md:p-2 bg-white shadow-lg rounded-xl overflow-hidden flex-shrink-0"
             >
               <Image
                 src={project.image}
