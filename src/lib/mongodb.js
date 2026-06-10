@@ -1,11 +1,30 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = "mongodb+srv://sharmatech:Mongodb@26@cluster0.xwpbycu.mongodb.net/sharmatechDb";
+const MONGODB_URI = process.env.MONGODB_URI;
 
-export const connectDB = async () => {
-  if (mongoose.connections[0].readyState) return;
+if (!MONGODB_URI) {
+  throw new Error("Please define MONGODB_URI");
+}
 
-  await mongoose.connect(MONGODB_URI);
-};
+let cached = global.mongoose;
 
+if (!cached) {
+  cached = global.mongoose = {
+    conn: null,
+    promise: null,
+  };
+}
 
+export async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      dbName: "sharmatechDb",
+    });
+  }
+
+  cached.conn = await cached.promise;
+  console.log("MongoDB Connected");
+  return cached.conn;
+}
