@@ -9,6 +9,7 @@ import {
   FaLock,
   FaUser,
 } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 
 
@@ -20,6 +21,8 @@ export default function Navbar ()  {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const router = useRouter();
 
   const [form, setForm] = useState({
     name: "",
@@ -69,7 +72,7 @@ export default function Navbar ()  {
   };
 
   // Submit
-  const handleSubmit = (e) => {
+  const  handleSubmit = (e) => {
     e.preventDefault();
 
     const validationErrors = validate();
@@ -79,11 +82,35 @@ export default function Navbar ()  {
       return;
     }
 
-    alert(
-      modalOpen
-        ? "Login Successful"
-        : "Signup Successful"
-    );
+    if(Object.keys(validationErrors).length !=0){
+      const res =  fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data =  res.json();
+
+    if (res.ok && data.token) {
+      localStorage.setItem("token", data.token);
+
+      // Redirect to Dashboard
+      router.push("/dashboard");
+    } else {
+      alert(data.message);
+    }
+    }
+
+    // alert(
+    //   modalOpen
+    //     ? handleLogin(form)
+    //     : "Signup Successful"
+    // );
 
     setForm({
       name: "",
@@ -93,6 +120,7 @@ export default function Navbar ()  {
 
     setMobileMenuOpen(false);
   };
+  
 
   // Navigation items array
   const menuItems = [

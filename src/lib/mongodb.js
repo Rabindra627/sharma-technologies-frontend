@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = "mongodb://localhost:27017/sharmatech_db";
+const MONGODB_URI = "mongodb+srv://sharmatech:Mongodb@26@cluster0.xwpbycu.mongodb.net/";
 
 export const connectDB = async () => {
   if (mongoose.connections[0].readyState) return;
