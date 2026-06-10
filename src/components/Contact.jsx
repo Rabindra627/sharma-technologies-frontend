@@ -101,14 +101,14 @@ export default function Contact() {
     >
       <div className="max-w-6xl mx-auto">
         {/* Title */}
-        <motion.h2
+        <motion.h3
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-14"
+          className="text-4xl md:text-4xl font-bold text-center text-blue-400 mb-14"
         >
           Contact Us
-        </motion.h2>
+        </motion.h3>
 
         <div className="grid lg:grid-cols-2 gap-10">
           {/* Left Side */}
