@@ -46,28 +46,15 @@ export default function Hero() {
         >is a software development company specializing in innovative web applications, mobile applications, enterprise software solutions, cloud computing, IoT systems, and digital transformation services. We help businesses improve efficiency, enhance customer experiences, and achieve growth through modern technology solutions.</motion.p>
         
      <motion.button
-  whileHover={{ scale: 1.08, y: -4 }}
-  whileTap={{ scale: 0.95 }}
-  onClick={() => {
-    document.getElementById("services")?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }}
-  className="
-    mt-8 flex items-center gap-2
-    bg-white/10 backdrop-blur-md
-    border border-white/30
-    text-white
-    px-8 py-3
-    rounded-full
-    font-semibold
-    shadow-lg
-    hover:bg-white
-    hover:text-blue-600
-    hover:border-white
-    transition-all duration-300
-  "
->
+        whileHover={{ scale: 1.08, y: -4 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => {
+          document.getElementById("services")?.scrollIntoView({
+          behavior: "smooth",
+        });
+      }}
+      className="mt-8 flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:text-blue-600 hover:border-white transition-all duration-300"
+    >
   Get Started
   <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
 </motion.button>
