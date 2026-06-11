@@ -77,7 +77,6 @@ export default function Navbar() {
       });
 
       const data = await res.json();
-      console.log(data);
       if (res.ok) {
         if (data.token) {
           localStorage.setItem("token", data.token);
@@ -95,7 +94,11 @@ export default function Navbar() {
 
         router.push("/dashboard");
       } else {
-        alert(data.message || `${isLogin ? "Login" : "Signup"} failed`);
+          if (data.errors) {
+          setErrors(data.errors);
+        } else {
+          alert(data.message || `${isLogin ? "Login" : "Signup"} failed`);
+        }
       }
     } catch (error) {
       console.error(error);
