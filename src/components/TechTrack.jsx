@@ -33,7 +33,7 @@ export default function TechTrack() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-5xl mx-auto  backdrop-blur-md rounded-full">
+      <div className="max-w-5xl mx-auto  backdrop-blur-md rounded-1xl">
         {/* Hero Header */}
         <div className="text-center mb-10">
           <motion.h1
