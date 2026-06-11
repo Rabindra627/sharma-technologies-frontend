@@ -7,6 +7,7 @@ import BlogsSection from "@/components/BlogsSection";
 // import Contact from "@/components/Contact2";
 import Contact from "@/components/Contact";
 import OurTeamPage from "@/components/OurTeams";
+import TechTrack from "@/components/TechTrack";
 
 
 export default function Home(){
@@ -18,6 +19,7 @@ return(
 <Services/>
 <Portfolio/>
 <OurTeamPage/>
+<TechTrack/>
 <BlogsSection/>
 <Contact/>
 <Footer/>

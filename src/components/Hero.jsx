@@ -58,7 +58,7 @@ export default function Hero() {
                 behavior: "smooth",
               });
             }}
-            className="mt-8 flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:text-blue-600 hover:border-white transition-all duration-300"
+            className="mt-8 flex items-center lg:hover:bg-blue-500 md:hover:bg-white-900 gap-2 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:text-blue-600 hover:border-white transition-all duration-300"
           >
             Get Started
             <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
@@ -79,15 +79,16 @@ export default function Hero() {
         </div>
       </div>
       {/* Bottom Curve */}
-      <div className="absolute bottom-0 left-0 w-full">
+      <div className="absolute bottom-0 left-0 w-full pointer-events-none translate-y-[1px]">
         <svg
-          viewBox="0 0 1430 220"
-          className="w-full h-56"
+          viewBox="0 0 1440 220"
+          className="w-full h-auto max-h-56 object-cover"
+          preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            fill="#ffffff81"
-            d="M0,192L80,202.7C160,213,320,235,480,229.3C640,224,800,192,960,176C1120,160,1280,160,1360,160L1440,160L1440,320L0,320Z"
+            fill="#ffffff"
+            d="M0,192L80,202.7C160,213,320,235,480,229.3C640,224,800,192,960,176C1120,160,1280,160,1360,160L1440,160L1440,220L0,220Z"
           />
         </svg>
       </div>
