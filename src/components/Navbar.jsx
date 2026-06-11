@@ -12,7 +12,7 @@ export default function Navbar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
 
-  // const router = useRouter();
+  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -68,12 +68,19 @@ export default function Navbar() {
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
+      // 1. Prepare the payload based on whether the action is Login or Register
+      const payload = isLogin
+        ? { email: form.email, password: form.password } // Login only needs email/password
+        : { name: form.name, email: form.email, password: form.password }; // Register needs all
+
+      // 2. Make the corrected fetch call
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -94,7 +101,7 @@ export default function Navbar() {
 
         router.push("/dashboard");
       } else {
-          if (data.errors) {
+        if (data.errors) {
           setErrors(data.errors);
         } else {
           alert(data.message || `${isLogin ? "Login" : "Signup"} failed`);
@@ -286,7 +293,9 @@ export default function Navbar() {
                         />
                       </div>
                       {errors.name && (
-                        <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.name}
+                        </p>
                       )}
                     </div>
                   )}
@@ -304,7 +313,9 @@ export default function Navbar() {
                       />
                     </div>
                     {errors.email && (
-                      <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
 
@@ -336,7 +347,9 @@ export default function Navbar() {
                 </form>
 
                 <div className="text-center mt-6 text-gray-600">
-                  {isLogin ? "Don't have an account?" : "Already have an account?"}
+                  {isLogin
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
 
                   <button
                     onClick={() => {
