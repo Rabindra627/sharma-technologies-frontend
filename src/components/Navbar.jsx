@@ -12,8 +12,7 @@ export default function Navbar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
 
-  const router = useRouter();
-
+  // const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -67,7 +66,7 @@ export default function Navbar() {
     }
 
     try {
-      const endpoint = isLogin ? "/api/login" : "/api/signup";
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -78,7 +77,7 @@ export default function Navbar() {
       });
 
       const data = await res.json();
-
+      console.log(data);
       if (res.ok) {
         if (data.token) {
           localStorage.setItem("token", data.token);
@@ -108,6 +107,7 @@ export default function Navbar() {
     { name: "Services", href: "#services" },
     { name: "Portfolio", href: "#portfolio" },
     { name: "Blog", href: "#blog" },
+    { name: "Career", href: "#career" },
     { name: "Contact", href: "#contact" },
   ];
 

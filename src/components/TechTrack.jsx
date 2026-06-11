@@ -39,7 +39,7 @@ export default function TechTrack() {
           <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            whileInView={{ opacity: 1, y: 1 }}
+            whileInView={{ opacity: 1}}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-3xl font-extrabold text-blue-400 sm:text-4xl tracking-tight"
           >
