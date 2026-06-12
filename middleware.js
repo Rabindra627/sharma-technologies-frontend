@@ -10,7 +10,7 @@ export function middleware(request) {
     const path = request.nextUrl.pathname;
     const isProtected = path.startsWith("/dashboard");
 
-    const isAuthPage = path === "/";
+    const isAuthPage = path === "/login";
     
   if (!token && isProtected) {
     return NextResponse.redirect(
@@ -21,7 +21,7 @@ export function middleware(request) {
     try {
       jwt.verify(token,process.env.JWT_SECRET);
 
-      if (token && isProtected) {
+      if (token && isAuthPage) {
         return NextResponse.redirect(
           new URL("/dashboard", request.url)
         );
