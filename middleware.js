@@ -10,7 +10,7 @@ export function middleware(request) {
     const path = request.nextUrl.pathname;
     const isProtected = path.startsWith("/dashboard");
 
-    const isAuthPage = path === "/login";
+    const isAuthPage = path === "/dashboard";
     
   if (!token && isProtected) {
     return NextResponse.redirect(
@@ -31,7 +31,7 @@ export function middleware(request) {
       }
     } catch {
       const response = NextResponse.redirect(
-        new URL("/login", request.url)
+        new URL("/", request.url)
       );
 
       response.cookies.delete("token");
