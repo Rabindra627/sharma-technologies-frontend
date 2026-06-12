@@ -23,7 +23,7 @@ export function middleware(request) {
 
       if (token && isAuthPage) {
         return NextResponse.redirect(
-          new URL("/dashboard", request.url)
+          new URL("/dashboard/", request.url)
         );
       }
     } catch {
@@ -42,7 +42,7 @@ export function middleware(request) {
 
 export const config = {
   matcher: [
-    "/dashboard",  
+    "/dashboard/",  
     "/dashboard/:path*"   
   ],
 };
