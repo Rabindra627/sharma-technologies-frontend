@@ -7,6 +7,8 @@ import {
   FolderKanban,
   DollarSign,
   TrendingUp,
+  Mail,
+  UserPlus,
 } from "lucide-react";
 
 import {
@@ -20,6 +22,30 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+
+// Activities
+const activities = [
+  {
+    title: "New client added",
+    time: "2 minutes ago",
+    icon: Users,
+  },
+  {
+    title: "New project added",
+    time: "10 minutes ago",
+    icon: FolderKanban,
+  },
+  {
+    title: "New inquiry received",
+    time: "25 minutes ago",
+    icon: Mail,
+  },
+  {
+    title: "New user registered",
+    time: "1 hour ago",
+    icon: UserPlus,
+  },
+];
 
 const revenueData = [
   { month: "Jan", revenue: 4000 },
@@ -116,13 +142,13 @@ export default function AnalyticsPage() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
         <motion.div
-           initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{
-              y: -8,
-              scale: 1.02,
-            }}
-            transition={{ duration: 0.25 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{
+            y: -8,
+            scale: 1.02,
+          }}
+          transition={{ duration: 0.25 }}
           className="lg:col-span-2 bg-white rounded-3xl p-6 shadow-lg"
         >
           <h2 className="text-xl font-bold mb-6">Revenue Growth</h2>
@@ -147,18 +173,19 @@ export default function AnalyticsPage() {
         </motion.div>
 
         {/* Activity */}
-        <motion.div 
-         initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{
-              y: -8,
-              scale: 1.02,
-            }}
-            transition={{ duration: 0.25 }}
-        className="bg-white rounded-3xl p-6 shadow-lg">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{
+            y: -8,
+            scale: 1.02,
+          }}
+          transition={{ duration: 0.25 }}
+          className="bg-white rounded-3xl p-6 shadow-lg"
+        >
           <h2 className="text-xl font-bold mb-6">Recent Activity</h2>
 
-          {[1, 2, 3, 4].map((item) => (
+          {/* {[1, 2, 3, 4].map((item) => (
             <div key={item} className="flex items-center gap-4 mb-5">
               <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                 <Users size={18} />
@@ -170,7 +197,23 @@ export default function AnalyticsPage() {
                 <p className="text-sm text-slate-500">2 minutes ago</p>
               </div>
             </div>
-          ))}
+          ))} */}
+          {activities.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <div key={index} className="flex items-center gap-4 mb-5">
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Icon size={18} className="text-purple-600" />
+                </div>
+
+                <div>
+                  <h4 className="font-medium">{item.title}</h4>
+                  <p className="text-sm text-slate-500">{item.time}</p>
+                </div>
+              </div>
+            );
+          })}
         </motion.div>
       </div>
 
@@ -182,7 +225,7 @@ export default function AnalyticsPage() {
       >
         <h2 className="text-xl font-bold mb-6">Projects Overview</h2>
 
-        <div className="h-[350px]">
+        <div className="h-[170px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={projectData}>
               <CartesianGrid strokeDasharray="3 3" />
