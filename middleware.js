@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 export function middleware(request) {
   const token = request.cookies.get("token")?.value;
@@ -11,10 +12,7 @@ export function middleware(request) {
 
     const isAuthPage = path === "/login";
     
-  if (
-    !token &&
-    request.nextUrl.pathname.startsWith("/dashboard")
-  ) {
+  if (!token && isProtected) {
     return NextResponse.redirect(
       new URL("/", request.url)
     );
