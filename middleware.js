@@ -10,7 +10,7 @@ export function middleware(request) {
     const path = request.nextUrl.pathname;
     const isProtected = path.startsWith("/dashboard");
 
-    const isAuthPage = path === "/dashboard";
+    const isAuthPage = path === "/";
     
   if (!token && isProtected) {
     return NextResponse.redirect(
