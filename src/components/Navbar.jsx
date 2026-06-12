@@ -84,8 +84,8 @@ export default function Navbar() {
       });
 
       const data = await res.json();      
-      if (res.ok) {
-        alert(data.message);
+      if (res.ok) {       
+        alert(data.token); 
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
@@ -101,6 +101,7 @@ export default function Navbar() {
         setMobileMenuOpen(false);
         if(isLogin){
           router.push("/dashboard");
+          router.refresh();
         }        
       } else {
         if (res.error) {
