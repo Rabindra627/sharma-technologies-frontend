@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 export default function TechTrack() {
   const techStats = [
     {
-      name: "Next.js (App Router & SSR)",
+      name: "Next.js",
       percentage: 45,
       colorGradient: "from-zinc-950 via-zinc-800 to-black",
       glowColor: "shadow-black/40",
@@ -28,6 +28,12 @@ export default function TechTrack() {
       percentage: 10,
       colorGradient: "from-purple-500 via-fuchsia-500 to-purple-600",
       glowColor: "shadow-fuchsia-500/60",
+    },
+    {
+      name: "Java",
+      percentage: 100,
+      colorGradient: "from-cyan-500 via-cyan-500 to-cyan-600",
+      glowColor: "shadow-cyan-500/60",
     },
   ];
 
