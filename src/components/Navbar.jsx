@@ -85,6 +85,7 @@ export default function Navbar() {
 
       const data = await res.json();      
       if (res.ok) {
+        alert(data.message);
         if (data.token) {
           localStorage.setItem("token", data.token);
         }

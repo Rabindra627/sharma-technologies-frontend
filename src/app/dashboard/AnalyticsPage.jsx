@@ -206,7 +206,6 @@ export default function AnalyticsPage() {
                 <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
                   <Icon size={18} className="text-purple-600" />
                 </div>
-
                 <div>
                   <h4 className="font-medium">{item.title}</h4>
                   <p className="text-sm text-slate-500">{item.time}</p>
