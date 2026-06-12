@@ -10,10 +10,10 @@ export default function Dashboard() {
       <h1 className="text-2xl font-bold mb-4">
         Dashboard
       </h1>
-    {/*
-      <p className="text-gray-500 mb-6">
+    
+      <p className="text-gray-500 mb-2">
         Manage Users, Inquiries, Projects and Clients.
-      </p>*/} 
+      </p> 
       {/* Below added Dashboard cards view on 03.08.2026  */}
       <DashboardCards />
       <AnalyticsPage/>
