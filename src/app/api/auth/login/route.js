@@ -1,23 +1,24 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/mongodb';
 import bcrypt from 'bcryptjs';
+import User from '@/models/User';
+import { connectDB } from '@/lib/mongodb';
+
 
 export async function POST(request) {
   try {
+     await connectDB();
     const { email, password } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
-
-    const { db } = await connectDB();
-    const user = await db.collection('users').findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email });
 
     if (!user) {
       return NextResponse.json({ error: 'Invalid login credentials' }, { status: 401 });
     }
-
-    const isPasswordCorrect = await bcrypt.compare(password, user.passwordHash);
+    // compare password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
       return NextResponse.json({ error: 'Invalid login credentials' }, { status: 401 });
     }

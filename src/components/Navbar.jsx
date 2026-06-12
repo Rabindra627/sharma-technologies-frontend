@@ -64,7 +64,7 @@ export default function Navbar() {
       setErrors(validationErrors);
       return;
     }
-
+    
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
 
@@ -83,7 +83,7 @@ export default function Navbar() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await res.json();      
       if (res.ok) {
         if (data.token) {
           localStorage.setItem("token", data.token);
@@ -98,13 +98,14 @@ export default function Navbar() {
         setErrors({});
         setModalOpen(false);
         setMobileMenuOpen(false);
-
-        router.push("/dashboard");
+        if(isLogin){
+          router.push("/dashboard");
+        }        
       } else {
-        if (data.errors) {
-          setErrors(data.errors);
+        if (res.error) {
+          setErrors(res.error);
         } else {
-          alert(data.message || `${isLogin ? "Login" : "Signup"} failed`);
+          alert(`${isLogin ? data.error : data.error}`);
         }
       }
     } catch (error) {

@@ -1,32 +1,34 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/mongodb';
 import bcrypt from 'bcryptjs';
+import User from '@/models/User';
+import { connectDB } from '@/lib/mongodb';
+
+
 
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json();
-
-    if (!email || !password) {
+     await connectDB();
+    const body = await request.json();
+    
+    if (!body.email || !body.password) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-
-    const { db } = await connectDB();
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = body.email.toLowerCase().trim();
 
     console.log(normalizedEmail);
 
     // Query native driver collection directly
-    const existingUser = await db.collection('users').findOne({ email: normalizedEmail });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
     }
     
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(hashedPassword);
-    const result = await db.collection('users').insertOne({
-      name : name || '',
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+    
+    const result = await User.create({
+      name : body.name || '',
       email: normalizedEmail,
-      passwordHash: hashedPassword,
+      password: hashedPassword,
       createdAt: new Date(),
     });
 
