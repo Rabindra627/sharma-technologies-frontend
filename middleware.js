@@ -5,7 +5,7 @@ export function middleware(request) {
   const token = request.cookies.get("token")?.value;
 
   // Protect dashboard routes
-  console.log(token);
+  console.log("TOKEN : ",token);
   // path
     const path = request.nextUrl.pathname;
     const isProtected = path.startsWith("/dashboard");
