@@ -14,14 +14,14 @@ export function middleware(request) {
     
   if (!token && isProtected) {
     return NextResponse.redirect(
-      new URL("/dashboard", request.url)
+      new URL("/", request.url)
     );
   }
   if (token) {
     try {
       jwt.verify(token,process.env.JWT_SECRET);
 
-      if (isProtected) {
+      if (token && isProtected) {
         return NextResponse.redirect(
           new URL("/dashboard", request.url)
         );
