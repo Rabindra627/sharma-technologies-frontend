@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
-export default function Navbar() {
+
+export default  function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -116,6 +117,7 @@ export default function Navbar() {
     }
   };
 
+
   const menuItems = [
     { name: "Services", href: "#services" },
     { name: "Portfolio", href: "#portfolio" },
@@ -140,6 +142,28 @@ export default function Navbar() {
       setMobileMenuOpen(false);
     }
   };
+
+  useEffect(() => {
+  async function checkLogin() {
+    try {
+      const res = await fetch("/api/auth/me", {
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+
+        if (data.authenticated) {
+          router.push("/dashboard");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  checkLogin();
+}, [router]);
 
   return (
     <nav
