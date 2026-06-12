@@ -5,7 +5,7 @@ export function middleware(request) {
   const token = request.cookies.get("token")?.value;
 
   // Protect dashboard routes
-
+  console.log(token);
   // path
     const path = request.nextUrl.pathname;
     const isProtected = path.startsWith("/dashboard");
@@ -14,7 +14,7 @@ export function middleware(request) {
     
   if (!token && isProtected) {
     return NextResponse.redirect(
-      new URL("/", request.url)
+      new URL("/dashboard", request.url)
     );
   }
   if (token) {
