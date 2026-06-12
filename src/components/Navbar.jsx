@@ -362,7 +362,7 @@ export default function Navbar() {
                         password: "",
                       });
                     }}
-                    className="ml-2 text-cyan-600 font-semibold hover:bg-cyan-600"
+                    className="ml-2 text-cyan-600 font-semibold cursor-pointer"
                   >
                     {isLogin ? "Sign Up" : "Login"}
                   </button>

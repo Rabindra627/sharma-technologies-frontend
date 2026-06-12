@@ -58,6 +58,9 @@ export default function Sidebar({
       });
 
       if (res.ok) {
+        localStorage.removeItem("user");
+        sessionStorage.clear();
+
         router.push("/");
         router.refresh();
       }
