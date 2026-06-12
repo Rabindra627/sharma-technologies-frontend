@@ -36,10 +36,10 @@ export default function TechTrack() {
       glowColor: "shadow-cyan-500/60",
     },
     {
-      name: "AI - Genetic AI (For Automation)",
+      name: "AI - Generative AI (For Automation)", 
       percentage: 20,
-      colorGradient: "from-warning-500 via-warning-500 to-warning-600",
-      glowColor: "shadow-warning-500/65",
+      colorGradient: "from-amber-500 via-amber-500 to-amber-600",
+      glowColor: "shadow-amber-500/65",
     },
   ];
 
