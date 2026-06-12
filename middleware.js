@@ -19,12 +19,9 @@ export function middleware(request) {
   }
   if (token) {
     try {
-      jwt.verify(
-        token,
-        process.env.JWT_SECRET
-      );
+      jwt.verify(token,process.env.JWT_SECRET);
 
-      if (isAuthPage) {
+      if (isProtected) {
         return NextResponse.redirect(
           new URL("/dashboard", request.url)
         );
@@ -45,9 +42,7 @@ export function middleware(request) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/admin/:path*",
-    "/profile/:path*",
+    "/dashboard/:path*"   
   ],
 };
 

@@ -1,14 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Briefcase,
-  FolderKanban,
-  Mail,
-  Users,
-  TrendingUp,
-} from "lucide-react";
-import AnalyticsPage from "@/app/dashboard/AnalyticsPage";
+import { Briefcase, FolderKanban, Mail, Users, TrendingUp } from "lucide-react";
 
 export default function DashboardCards() {
   const cards = [
@@ -50,21 +43,9 @@ export default function DashboardCards() {
         return (
           <motion.div
             key={index}
-            whileHover={{
-              y: -8,
-              scale: 1.02,
-            }}
+            whileHover={{ y: -8,scale: 1.02,}}
             transition={{ duration: 0.25 }}
-            className="
-              relative
-              overflow-hidden
-              bg-white
-              rounded-3xl
-              p-4
-              shadow-lg
-              hover:shadow-2xl
-              border border-slate-100
-            "
+            className="relative overflow-hidden bg-white rounded-3xl p-4 shadow-lg hover:shadow-2xl border border-slate-100"
           >
             {/* Background Glow */}
             <div
@@ -73,9 +54,7 @@ export default function DashboardCards() {
 
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-slate-500 text-sm">
-                  {card.title}
-                </p>
+                <p className="text-slate-500 text-sm">{card.title}</p>
 
                 <h3 className="text-2xl font-bold mt-3 text-slate-800">
                   {card.count}
@@ -83,9 +62,7 @@ export default function DashboardCards() {
 
                 <div className="flex items-center gap-1 mt-1 text-green-500">
                   <TrendingUp size={12} />
-                  <span className="text-sm font-medium">
-                    {card.growth}
-                  </span>
+                  <span className="text-sm font-medium">{card.growth}</span>
                 </div>
               </div>
 
@@ -112,12 +89,10 @@ export default function DashboardCards() {
                   />
                 )
               )}
-            </div> */}               
+            </div> */}
           </motion.div>
-          
         );
-        
-      })}        
-    </div>    
+      })}
+    </div>
   );
 }
