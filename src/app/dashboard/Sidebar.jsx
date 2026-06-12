@@ -9,7 +9,7 @@ import {
   Users,
   LogOut,
   FolderKanban,
-  Briefcase
+  Briefcase,
 } from "lucide-react";
 
 export default function Sidebar({
@@ -53,26 +53,24 @@ export default function Sidebar({
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/admin/logout", {
+      const res = await fetch("/api/auth/logout", {
         method: "POST",
       });
 
       if (res.ok) {
         router.push("/");
+        router.refresh();
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
-
   return (
     <>
       {/* Mobile Overlay */}
       <div
         className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-all duration-300 ${
-          mobileOpen
-            ? "opacity-100 visible"
-            : "opacity-0 invisible"
+          mobileOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
         onClick={() => setMobileOpen(false)}
       />
@@ -87,11 +85,7 @@ export default function Sidebar({
           shadow-[0_20px_50px_rgba(8,_112,_184,_0.08)]
           transition-all duration-300 ease-in-out
           ${collapsed ? "w-20" : "w-58"}
-          ${
-            mobileOpen
-              ? "translate-x-0"
-              : "-translate-x-full lg:translate-x-0"
-          }
+          ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
         {/* Logo */}
@@ -107,10 +101,8 @@ export default function Sidebar({
           </div>
 
           {!collapsed && (
-            <div className="ml-3">            
-              <p className="text-xs text-slate-500">
-                Admin Panel
-              </p>
+            <div className="ml-3">
+              <p className="text-xs text-slate-500">Admin Panel</p>
             </div>
           )}
         </div>
@@ -154,11 +146,7 @@ export default function Sidebar({
                   <Icon size={18} />
                 </div>
 
-                {!collapsed && (
-                  <span className="font-medium">
-                    {item.name}
-                  </span>
-                )}
+                {!collapsed && <span className="font-medium">{item.name}</span>}
               </Link>
             );
           })}
