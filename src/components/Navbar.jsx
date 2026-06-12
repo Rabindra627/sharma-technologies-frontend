@@ -102,7 +102,7 @@ export default  function Navbar() {
         setMobileMenuOpen(false);
         if(isLogin){
           router.push("/dashboard");
-          router.refresh();
+          // router.refresh();
         }        
       } else {
         if (res.error) {
