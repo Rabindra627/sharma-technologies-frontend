@@ -159,15 +159,12 @@ export default function Sidebar({
         <div className="absolute bottom-6 left-0 right-0 px-4">
           <button
             onClick={onLogout}
-            className="
-              w-full flex items-center justify-center gap-2
-              py-3 rounded-2xl
-              bg-gradient-to-r from-red-500 to-rose-500
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500
               text-white font-medium
               shadow-lg
               hover:scale-[1.02]
               transition-all duration-300
-            "
+            `}
           >
             <LogOut size={18} />
             {!collapsed && "Logout"}

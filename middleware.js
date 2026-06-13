@@ -12,7 +12,7 @@ export async function middleware(request) {
 
   // 1. Unauthenticated users can't see protected pages
   if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // 2. Authenticated users shouldn't see auth pages

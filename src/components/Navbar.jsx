@@ -86,9 +86,10 @@ export default  function Navbar() {
 
       const data = await res.json();      
       if (res.ok) {  
-        console.log(data);             
+        console.log(data);          
+        console.log(data.user);             
         if (data.token) {
-          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
         }
 
         setForm({

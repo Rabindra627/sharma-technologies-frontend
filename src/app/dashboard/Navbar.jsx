@@ -18,11 +18,24 @@ export default function Navbar({
 
   // Mock Active User Data matching your interface layout
   const currentUser = {
-    name: "Rabindra",
+    name: "Rabindra Sharma",
     role: "Administrator",
     email: "rabindra@enterprise.io",
     avatarUrl: "https://i.pravatar.cc/150?img=12"
   };
+
+
+  // Load verified user identity profile on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Error parsing stored user data", e);
+      }
+    }
+  }, []);
 
   // Close the popup menu gracefully if clicked outside the container
   useEffect(() => {
