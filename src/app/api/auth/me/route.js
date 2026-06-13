@@ -15,10 +15,7 @@ export async function GET() {
       );
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    const decoded = jwt.verify(token,process.env.JWT_SECRET);
 
     return NextResponse.json({
       authenticated: true,

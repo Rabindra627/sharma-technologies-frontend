@@ -2,37 +2,41 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 export function middleware(request) {
-  const token = request.cookies.get("token")?.value;
+  const token = request.cookies.get("token")?.value ||'';
 
   // Protect dashboard routes
   console.log("TOKEN : ",token);
   // path
     const path = request.nextUrl.pathname;
-    const isProtected = path.startsWith("/dashboard");
+    const isPublicPath = path === '/' || path === '/login' || path === 'signup';
 
-    const isAuthPage = path === "/login";
     
-  if (!token && isProtected) {
+    
+  if (isPublicPath && token) {
+    return NextResponse.redirect(
+      new URL("/dashboard", request.url)
+    );
+  }
+  if(!isPublicPath && !token){
     return NextResponse.redirect(
       new URL("/", request.url)
     );
   }
+
   if (token) {
     try {
       jwt.verify(token,process.env.JWT_SECRET);
 
-      if (token && isAuthPage) {
+      if (isPublicPath && token) {
         return NextResponse.redirect(
-          new URL("/dashboard/", request.url)
+          new URL("/dashboard", request.url)
         );
       }
     } catch {
       const response = NextResponse.redirect(
         new URL("/", request.url)
       );
-
       response.cookies.delete("token");
-
       return response;
     }
   }
@@ -42,8 +46,9 @@ export function middleware(request) {
 
 export const config = {
   matcher: [
-    "/dashboard/",  
-    "/dashboard/:path*"   
+    "/dashboard",  
+    "/dashboard/:path*",
+    "/"   
   ],
 };
 
