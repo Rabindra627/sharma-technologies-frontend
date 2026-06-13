@@ -77,6 +77,16 @@ export default function ManageUsersPage() {
     }
   };
 
+  useEffect(() => {
+    const getUsers = async () => {
+      const res = await fetch("/api/users");
+      const data = await res.json();
+      console.log(data);
+    };
+
+    getUsers();
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-10 dark:bg-slate-950 text-slate-900 dark:text-slate-50 relative selection:bg-blue-500/10">
       <div className="max-w-6xl mx-auto space-y-6">
