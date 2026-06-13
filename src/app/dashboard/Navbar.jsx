@@ -117,7 +117,8 @@ export default function Navbar({
               bg-white
               border border-slate-200
               rounded-2xl
-              px-3 py-2
+              px-3 py-1
+              m-2
               hover:shadow-md
               transition-all
             "
