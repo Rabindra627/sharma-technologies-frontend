@@ -58,7 +58,7 @@ export default function Hero() {
                 behavior: "smooth",
               });
             }}
-            className="mt-8 flex items-center lg:hover:bg-blue-500 md:hover:bg-white-900 gap-2 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:text-blue-600 hover:border-white transition-all duration-300"
+            className="mt-8 flex items-center  md:hover:bg-white-900 gap-2 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:bg-white hover:text-blue-600 hover:border-white transition-all duration-300"
           >
             Get Started
             <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
