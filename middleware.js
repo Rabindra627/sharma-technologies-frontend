@@ -50,6 +50,7 @@ export const config = {
     "/login",
     "/signup",
     "/profile",
+    "/dashboard",
     "/dashboard/:path*" 
   ],
 };
