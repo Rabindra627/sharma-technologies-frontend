@@ -11,6 +11,20 @@ export function middleware(request) {
     path === "/login" ||
     path === "/signup";
 
+      // authenticated users shouldn't see auth pages
+  if (isPublicPath && token) {
+    return NextResponse.redirect(
+      new URL("/dashboard", request.url)
+    );
+  }
+
+  // unauthenticated users can't see protected pages
+  if (!isPublicPath && !token) {
+    return NextResponse.redirect(
+      new URL("/", request.url)
+    );
+  }
+
   if (token) {
     try {
       jwt.verify(token, process.env.JWT_SECRET);
@@ -24,19 +38,7 @@ export function middleware(request) {
     }
   }
 
-  // authenticated users shouldn't see auth pages
-  if (isPublicPath && token) {
-    return NextResponse.redirect(
-      new URL("/dashboard", request.url)
-    );
-  }
 
-  // unauthenticated users can't see protected pages
-  if (!isPublicPath && !token) {
-    return NextResponse.redirect(
-      new URL("/", request.url)
-    );
-  }
 
   return NextResponse.next();
 }
