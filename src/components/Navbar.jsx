@@ -153,7 +153,7 @@ export default  function Navbar() {
         const data = await res.json();
 
         if (data.authenticated) {
-          router.push("/dashboard/");
+          router.push("/dashboard");
         }
       }
     } catch (error) {
