@@ -21,7 +21,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 1 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight"
+            className="text-4xl sm:text-4xl lg:text-4xl font-extrabold leading-one sm:leading-one"
           >
             Build Future With Sharma Technologies
           </motion.h1>

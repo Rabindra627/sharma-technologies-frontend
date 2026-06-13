@@ -53,7 +53,7 @@ export default function Services() {
       className="py-20 md:py-28 bg-gradient-to-b from-white via-slate-50 to-blue-50 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl text-blue-400 md:text-5xl md:text-blue-400  font-bold text-center text-slate-800">
+        <h2 className="text-4xl text-blue-400 md:text-5xl md:text-blue-400 sm:text-blue-400  font-bold text-center text-blue-400">
           Our Services
         </h2>
 
