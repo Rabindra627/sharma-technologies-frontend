@@ -29,7 +29,7 @@ export async function middleware(request) {
       await jwtVerify(token, secret);
     } catch (error) {
       // If token is invalid/expired, clear cookie and redirect to login
-      const response = NextResponse.redirect(new URL("/login", request.url));
+      const response = NextResponse.redirect(new URL("/", request.url));
       response.cookies.delete("token");
       return response;
     }
