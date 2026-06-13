@@ -207,7 +207,7 @@ export default function Navbar({
                 {/* Action Links & Navigation Options */}
                 <div className="p-1.5 space-y-0.5">
                   <a
-                    href="#profile"
+                    href="/dashboard/profile"
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/60 transition-colors group"
                   >
@@ -218,7 +218,7 @@ export default function Navbar({
                   </a>
 
                   <a
-                    href="#settings"
+                    href="/dashboard/settings"
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/60 transition-colors group"
                   >
