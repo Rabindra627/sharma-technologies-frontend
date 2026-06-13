@@ -23,21 +23,16 @@ export async function POST(request) {
     if (!isPasswordCorrect) {
       return NextResponse.json({ error: 'Invalid login credentials' }, { status: 401 });
     }
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        email: user.email,
-        password: user.password
-      },
+    const token = jwt.sign({userId: user._id,email: user.email,password: user.password},
       process.env.JWT_SECRET,
       {
-        expiresIn: "7d",
+        expiresIn: "1h",
       }
     );
 
     const response = NextResponse.json({
       message: 'Authentication successful',
-      user: { id: user._id, name: user.name, email: user.email }
+      user: { id: user._id, name: user.name, email: user.email, token : token }
     }, { status: 200 }
     );
 
@@ -45,7 +40,7 @@ export async function POST(request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 3600000,
       path: "/",
     });
 
