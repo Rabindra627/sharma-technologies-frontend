@@ -162,8 +162,8 @@ export default function Navbar({
               aria-haspopup="true"
             >
               <img
-                src={storedUser.avatarUrl == null ? "" : storedUser.avatarUrl}
-                alt={storedUser.name}
+                src={storedUser?.avatarUrl || currentUser.avatarUrl}
+                alt={`profile`}
                 className="
                   w-9 h-9
                   rounded-xl
@@ -196,8 +196,8 @@ export default function Navbar({
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Signed In As</p>
                   <div className="flex items-center gap-3">
                     <img
-                      src={storedUser.avatarUrl === null ? '': storedUser.avatarUrl }
-                      alt={storedUser.name}
+                      src={storedUser?.avatarUrl || currentUser.avatarUrl}
+                      alt={'profile'}
                       className="w-8 h-8 rounded-lg object-cover"
                     />
                     <div className="overflow-hidden">

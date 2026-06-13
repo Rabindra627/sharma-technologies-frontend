@@ -37,7 +37,7 @@ export async function POST(request) {
         name: user.name,
         email: user.email, 
         token : token,
-        avatarUrl : user.avatarUr ? null : user.avatarUr
+        avatarUrl : user.avatarUrl || ''
          }
     }, { status: 200 }
     );

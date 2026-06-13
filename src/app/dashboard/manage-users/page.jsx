@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Initial mock data for users
 const INITIAL_USERS = [
@@ -63,8 +63,8 @@ export default function ManageUsersPage() {
   };
 
   // Delete User handler
-  const handleDeleteUser = (id) => {
-    setUsers(users.filter(user => user.id !== id));
+  const handleDeleteUser = (id) => {    
+    setUsers(users.filter(user => user._id !== id));
   };
 
   // Role Badge Styling System
@@ -79,9 +79,16 @@ export default function ManageUsersPage() {
 
   useEffect(() => {
     const getUsers = async () => {
-      const res = await fetch("/api/users");
-      const data = await res.json();
-      console.log(data);
+      try {
+        const res = await fetch("/api/auth/users");
+        const data = await res.json();
+
+        setUsers(data.users || data); // depends on your API response
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getUsers();
@@ -155,9 +162,9 @@ export default function ManageUsersPage() {
                   ))
                 ) : (
                   users.map((user) => (
-                    <tr key={user.id} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200">
+                    <tr key={user._id} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200">
                       <td className="py-4 px-6 flex items-center gap-3">
-                        <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 group-hover:scale-105 transition-transform" />
+                        <img src={user?.avatarUrl || '/images/prof_profile.png'} alt={user.name} className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 group-hover:scale-105 transition-transform" />
                         <div>
                           <span className="font-semibold text-slate-800 dark:text-slate-100 block group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{user.name}</span>
                           <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">{user.email}</span>
@@ -165,18 +172,18 @@ export default function ManageUsersPage() {
                       </td>
                       <td className="py-4 px-6">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getRoleStyle(user.role)}`}>
-                          {user.role}
+                          {user?.role || 'Admin'}
                         </span>
                       </td>
                       <td className="py-4 px-6">
                         <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${user.status === "Active" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${user.status === "Active" ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
-                          {user.status}
+                          {user.status || 'ACTIVE'}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs">{user.joined}</td>
+                      <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs">{user.createdAt}</td>
                       <td className="py-4 px-6 text-right">
-                        <button onClick={() => handleDeleteUser(user.id)} className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all active:scale-90">
+                        <button onClick={() => handleDeleteUser(user._id)} className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all active:scale-90">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
