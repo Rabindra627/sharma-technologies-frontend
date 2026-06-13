@@ -101,8 +101,8 @@ export default  function Navbar() {
         setErrors({});
         setModalOpen(false);
         setMobileMenuOpen(false);
-        if(isLogin){
-          toast.success(data.message);
+        toast.success(data.message);
+        if(isLogin){          
           setTimeout(() =>{
             router.push("/dashboard");
           },1500);

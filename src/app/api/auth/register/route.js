@@ -29,6 +29,7 @@ export async function POST(request) {
       name : body.name || '',
       email: normalizedEmail,
       password: hashedPassword,
+      avatarUrl : '',
       createdAt: new Date(),
     });
 
