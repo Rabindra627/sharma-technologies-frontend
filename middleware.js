@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
-export function middleware(request) {
+export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
-
   const path = request.nextUrl.pathname;
 
   const isPublicPath =
@@ -11,41 +10,40 @@ export function middleware(request) {
     path === "/login" ||
     path === "/signup";
 
-    // unauthenticated users can't see protected pages
+  // 1. Unauthenticated users can't see protected pages
   if (!isPublicPath && !token) {
-    return NextResponse.redirect(
-      new URL("/", request.url)
-    );
+    return NextResponse.redirect(new URL("/login", request.url));
   }
-      // authenticated users shouldn't see auth pages
-  if (isPublicPath && token) {
-    return NextResponse.redirect(
-      new URL("/dashboard", request.url)
-    );
-  }
-  
-  if (token) {
-    try {
-      jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      const response = NextResponse.redirect(
-        new URL("/", request.url)
-      );
 
+  // 2. Authenticated users shouldn't see auth pages
+  if (isPublicPath && token) {
+    // Optional: You could validate the token here too before redirecting
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  // 3. Token verification for protected pages
+  if (token && !isPublicPath) {
+    try {
+      // Secret must be encoded into a Uint8Array for 'jose'
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+      await jwtVerify(token, secret);
+    } catch (error) {
+      // If token is invalid/expired, clear cookie and redirect to login
+      const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("token");
       return response;
     }
   }
 
-
-
   return NextResponse.next();
 }
 
+// Ensure the matcher catches ALL routes you want to protect or redirect from
 export const config = {
   matcher: [
-    '/dashboard',
-    '/dashboard/:path*',
-    '/'    
+    '/',
+    '/login',
+    '/signup',
+    '/dashboard/:path*'
   ]
-}
+};
