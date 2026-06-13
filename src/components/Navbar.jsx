@@ -101,7 +101,7 @@ export default  function Navbar() {
         setModalOpen(false);
         setMobileMenuOpen(false);
         if(isLogin){
-          router.push("/dashboard/");
+          router.push("/dashboard");
         }        
       } else {
         if (res.error) {
