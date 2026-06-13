@@ -32,10 +32,11 @@ export function middleware(request) {
           new URL("/dashboard", request.url)
         );
       }
-    } catch {
+    } catch(error) {
       const response = NextResponse.redirect(
         new URL("/", request.url)
       );
+      alert(error)
       response.cookies.delete("token");
       return response;
     }
@@ -48,7 +49,8 @@ export const config = {
   matcher: [
     "/dashboard",  
     "/dashboard/:path*",
-    "/"   
+    "/",
+    "/profile"   
   ],
 };
 
