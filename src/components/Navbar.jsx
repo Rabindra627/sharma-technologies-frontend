@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
+import toast from 'react-hot-toast';
+
 
 export default  function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -85,10 +87,8 @@ export default  function Navbar() {
       });
 
       const data = await res.json();      
-      if (res.ok) {  
-        console.log(data);          
-        console.log(data.user);             
-        if (data.token) {
+      if (res.ok) {          
+        if (data.user.token) {
           localStorage.setItem("user", JSON.stringify(data.user));
         }
 
@@ -102,18 +102,22 @@ export default  function Navbar() {
         setModalOpen(false);
         setMobileMenuOpen(false);
         if(isLogin){
-          router.push("/dashboard");
+          toast.success(data.message);
+          setTimeout(() =>{
+            router.push("/dashboard");
+          },1500);
+          
         }        
       } else {
         if (res.error) {
           setErrors(res.error);
         } else {
-          alert(`${isLogin ? data.error : data.error}`);
+          toast.error(`${isLogin ? data.error : data.error}`);
         }
       }
     } catch (error) {
       console.error(error);
-      alert("Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 

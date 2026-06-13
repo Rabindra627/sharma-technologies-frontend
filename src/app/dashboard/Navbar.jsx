@@ -14,6 +14,7 @@ export default function Navbar({
   setMobileOpen,
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  // const [user, setUser] = useState(null);
   const menuRef = useRef(null);
 
   // Mock Active User Data matching your interface layout
@@ -24,19 +25,8 @@ export default function Navbar({
     avatarUrl: "https://i.pravatar.cc/150?img=12"
   };
 
-
-  // Load verified user identity profile on mount
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Error parsing stored user data", e);
-      }
-    }
-  }, []);
-
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+ 
   // Close the popup menu gracefully if clicked outside the container
   useEffect(() => {
     function handleClickOutside(event) {
@@ -172,8 +162,8 @@ export default function Navbar({
               aria-haspopup="true"
             >
               <img
-                src={currentUser.avatarUrl}
-                alt={currentUser.name}
+                src={storedUser.avatarUrl}
+                alt={storedUser.name}
                 className="
                   w-9 h-9
                   rounded-xl
@@ -183,7 +173,7 @@ export default function Navbar({
 
               <div className="hidden sm:block text-left">
                 <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">
-                  {currentUser.name}
+                  {storedUser.name}
                 </h4>
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-none mt-0.5">
