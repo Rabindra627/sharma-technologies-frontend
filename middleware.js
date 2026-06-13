@@ -36,7 +36,6 @@ export function middleware(request) {
       const response = NextResponse.redirect(
         new URL("/", request.url)
       );
-      alert(error)
       response.cookies.delete("token");
       return response;
     }
