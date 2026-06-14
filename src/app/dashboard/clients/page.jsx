@@ -26,6 +26,9 @@ export default function ClientsPage() {
     health: "Good"
   });
 
+
+  
+
   // Simulated Fluid Refresh Action
   const handleRefresh = () => {
     setIsRefreshing(true);
