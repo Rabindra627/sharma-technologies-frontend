@@ -223,6 +223,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      
       {/*WhatsApp Chat | Untitled WhatsApp Chat */} 
       <script src="https://elfsightcdn.com/platform.js" async></script>
       <div class="elfsight-app-2108d846-f6c2-493e-94d6-8c7f915491e5" data-elfsight-app-lazy></div>
