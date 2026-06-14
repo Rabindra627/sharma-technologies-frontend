@@ -14,7 +14,6 @@ export default function Navbar({
   setMobileOpen,
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  // const [user, setUser] = useState(null);
   const menuRef = useRef(null);
 
   // Mock Active User Data matching your interface layout
@@ -25,7 +24,15 @@ export default function Navbar({
     avatarUrl: "https://i.pravatar.cc/150?img=12"
   };
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+  // Inside your Navbar component:
+  const [user, setUser] = useState(() => {
+  // Check if we are running in the browser
+  if (typeof window !== "undefined") {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  }
+  return null;
+});
  
   // Close the popup menu gracefully if clicked outside the container
   useEffect(() => {
@@ -162,7 +169,7 @@ export default function Navbar({
               aria-haspopup="true"
             >
               <img
-                src={storedUser?.avatarUrl || currentUser.avatarUrl}
+                src={user?.avatarUrl || user.avatarUrl}
                 alt={`profile`}
                 className="
                   w-9 h-9
@@ -173,7 +180,7 @@ export default function Navbar({
 
               <div className="hidden sm:block text-left">
                 <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-tight">
-                  {storedUser.name}
+                  {user.name}
                 </h4>
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-none mt-0.5">
@@ -196,13 +203,13 @@ export default function Navbar({
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Signed In As</p>
                   <div className="flex items-center gap-3">
                     <img
-                      src={storedUser?.avatarUrl || currentUser.avatarUrl}
+                      src={user?.avatarUrl || user.avatarUrl}
                       alt={'profile'}
                       className="w-8 h-8 rounded-lg object-cover"
                     />
                     <div className="overflow-hidden">
-                      <span className="font-bold text-slate-800 dark:text-slate-200 block text-sm truncate">{storedUser.name}</span>
-                      <span className="text-xs text-slate-400 dark:text-slate-500 block truncate font-mono">{storedUser.email}</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200 block text-sm truncate">{user.name}</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500 block truncate font-mono">{user.email}</span>
                     </div>
                   </div>
                 </div>
