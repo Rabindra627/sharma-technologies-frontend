@@ -82,7 +82,6 @@ export default function ManageUsersPage() {
       try {
         const res = await fetch("/api/auth/users");
         const data = await res.json();
-
         setUsers(data.users || data); // depends on your API response
       } catch (error) {
         console.error("Failed to fetch users:", error);
