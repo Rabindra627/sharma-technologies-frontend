@@ -25,6 +25,13 @@ const blogs = [
     date: "Apr 4, 2026",
     author: "UrbanTech",
   },
+  {
+    title: "Web Development",
+    description: "Building website for enterprise business and platform.",
+    image: "/images/webblog.png",
+    date: "June 4, 2026",
+    author: "Anand Sharma",
+  },
 ];
 
 export default function BlogsSection() {
