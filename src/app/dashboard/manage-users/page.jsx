@@ -164,7 +164,7 @@ export default function ManageUsersPage() {
                     <tr key={user?._id} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200">
                       <td className="py-4 px-6 flex items-center gap-3">                        
                         <Image
-                          src={user?.avatarUrl || "/default-avatar.png"}
+                          src={user?.avatarUrl || "/images/profile/default-user.png"}
                           alt="User"
                           width={50}
                           height={50}

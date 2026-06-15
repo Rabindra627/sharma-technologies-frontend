@@ -176,8 +176,10 @@ useEffect(() => {
               aria-haspopup="true"
             >
               <Image
-                src={user?.avatarUrl || user?.avatarUrl}
+                src={user?.avatarUrl || "/images/profile/default-user.png"}
                 alt={`profile`}
+                width={100}
+                height={100}
                 className="
                   w-9 h-9
                   rounded-xl
@@ -210,8 +212,10 @@ useEffect(() => {
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Signed In As</p>
                   <div className="flex items-center gap-3">
                     <Image
-                      src={user?.avatarUrl || user?.avatarUrl}
+                      src={user?.avatarUrl || '/images/profile/default-user.png'}
                       alt={'profile'}
+                      height={100}
+                      width={100}
                       className="w-8 h-8 rounded-lg object-cover"
                     />
                     <div className="overflow-hidden">

@@ -129,14 +129,13 @@ export default function Sidebar({
             className={`ml-3 transition-all duration-300 ease-in-out whitespace-nowrap ${
               collapsed ? "opacity-0 translate-x-[-10px] pointer-events-none" : "opacity-100 translate-x-0"
             }`}
-          >
-            <p className="text-xs font-bold text-slate-800">Sharma Tech</p>
+          >            
             <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Admin Panel</p>
           </div>
         </div>
 
         {/* Menu Navigation */}
-        <nav className="px-3 py-4 space-y-1">
+        <nav className="px-3 py-4 space-y-1.5">
           {menu.map((item) => {
             const Icon = item.icon;
             const isSubmenuOpen = !!openSubmenus[item.name];
