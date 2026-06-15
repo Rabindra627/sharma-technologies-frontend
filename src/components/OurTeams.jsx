@@ -29,9 +29,9 @@ const teamMembers = [
   {
     name: "Anand Sharma",
     role: "Frontend Developer",
-    image: "/team/frontend.jpg",
+    image: "/images/profile/default-user.png",
     description:
-      "Specialized in React, Next.js animations, and responsive interfaces.",
+      "A UI/UX Designer sits at the intersection of user psychology and beautiful design. They are responsible for understanding user needs, crafting seamless user journeys, and creating high-fidelity, polished visual layouts that make digital products intuitive and enjoyable to use.",
     linkedin: "#",
     github: "#",
     twitter: "#",
@@ -39,9 +39,9 @@ const teamMembers = [
   {
     name: "Bikash Lama",
     role: "Backend Developer",
-    image: "/team/backend.jpg",
+    image: "/images/profile/default-user.png",
     description:
-      "Experienced in Java, Spring Boot, REST APIs, and database systems.",
+      "A Backend Engineer is responsible for building and maintaining the foundational server-side logic of an application. They handle everything that happens behind the scenes—ensuring data transitions seamlessly from databases to the client interface quickly, securely, and reliably.",
     linkedin: "#",
     github: "#",
     twitter: "#",
