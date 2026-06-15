@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
 import {
   LayoutDashboard,
-  Image,
   Mail,
   Users,
   LogOut,
   FolderKanban,
   Briefcase,
+  ChevronDown,
+  Circle
 } from "lucide-react";
 
 export default function Sidebar({
@@ -21,58 +23,75 @@ export default function Sidebar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  
+  // Track open states for submenus
+  const [openSubmenus, setOpenSubmenus] = useState({});
+
+  const toggleSubmenu = (name) => {
+    if (collapsed && setCollapsed) {
+      setCollapsed(false);
+    }
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
+  };
 
   const menu = [
-    {
-      name: "Dashboard",
-      link: "/dashboard",
-      icon: LayoutDashboard,
+    { 
+      name: "Dashboard", 
+      link: "/dashboard", 
+      icon: LayoutDashboard 
     },
-    {
-      name: "Manage Users",
-      link: "/dashboard/manage-users",
+    { 
+      name: "Users", 
       icon: Users,
+      hasSubmenu: true,
+      subItems: [
+        { name: "All Users", link: "/dashboard/manage-users" },
+        { name: "Roles & Permissions", link: "/dashboard/manage-users/roles" },
+      ]
     },
-    {
-      name: "Inquiries",
-      link: "/dashboard/inquiries",
-      icon: Mail,
+    { 
+      name: "Inquiries", 
+      link: "/dashboard/inquiries", 
+      icon: Mail 
     },
-    {
-      name: "Projects",
-      link: "/dashboard/projects",
+    { 
+      name: "Projects", 
       icon: FolderKanban,
+      hasSubmenu: true,
+      subItems: [
+        { name: "Active Projects", link: "/dashboard/projects" },
+        { name: "Archived", link: "/dashboard/projects/archived" },
+      ]
     },
-    {
-      name: "Clients",
-      link: "/dashboard/clients",
-      icon: Briefcase,
+    { 
+      name: "Clients", 
+      link: "/dashboard/clients", 
+      icon: Briefcase 
     },
   ];
 
   const onLogout = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-
+      const res = await fetch("/api/auth/logout", { method: "POST" });
       if (res.ok) {
         localStorage.removeItem("user");
         sessionStorage.clear();
-        toast.success('Logged Out Successfull!');
-        setTimeout(()=>{
+        toast.success('Logged Out Successfully!');
+        setTimeout(() => {
           router.push("/");
           router.refresh();
-        },500);
-       
+        }, 500);
       }
     } catch (error) {
-      toast.error("Error :", error);
+      toast.error("Error logging out");
       console.error(error);
     }
   };
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -83,7 +102,7 @@ export default function Sidebar({
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Sidebar */}
+      {/* Sidebar Container */}
       <aside
         className={`
           fixed lg:relative z-50
@@ -91,88 +110,191 @@ export default function Sidebar({
           bg-white/95 backdrop-blur-xl
           border-r border-slate-200
           shadow-[0_20px_50px_rgba(8,_112,_184,_0.08)]
-          transition-all duration-300 ease-in-out
-          ${collapsed ? "w-20" : "w-58"}
+          transition-all duration-300 ease-in-out overflow-x-hidden
+          ${collapsed ? "w-20" : "w-64"}
           ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Logo */}
-        <div className="h-15 flex items-center px-6 border-b border-slate-100">
-          <div className="w-12 h-12  bg-gradient-to-r from-white-600 to-white-600 flex items-center justify-center text-white font-bold">
+        {/* Logo Section */}
+        <div className="h-15 flex items-center px-4 border-b border-slate-100 overflow-hidden">
+          <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl bg-slate-50">
             <img
               src="/images/sharma-tech.png"
               alt="Admin"
-              width={100}
-              height={100}
-              className="rounded-xl object-cover"
+              className="w-8 h-8 rounded-lg object-cover"
             />
           </div>
 
-          {!collapsed && (
-            <div className="ml-3">
-              <p className="text-xs text-slate-500">Admin Panel</p>
-            </div>
-          )}
+          <div
+            className={`ml-3 transition-all duration-300 ease-in-out whitespace-nowrap ${
+              collapsed ? "opacity-0 translate-x-[-10px] pointer-events-none" : "opacity-100 translate-x-0"
+            }`}
+          >
+            <p className="text-xs font-bold text-slate-800">Sharma Tech</p>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Admin Panel</p>
+          </div>
         </div>
 
-        {/* Menu */}
-        <nav className="px-3 py-6 space-y-2">
+        {/* Menu Navigation */}
+        <nav className="px-3 py-4 space-y-1">
           {menu.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.link;
+            const isSubmenuOpen = !!openSubmenus[item.name];
+            
+            const isParentActive = item.hasSubmenu 
+              ? item.subItems.some(sub => pathname === sub.link)
+              : pathname === item.link;
 
+            if (item.hasSubmenu) {
+              return (
+                <div key={item.name} className="space-y-1">
+                  {/* Dropdown Trigger Header Button */}
+                  <button
+                    onClick={() => toggleSubmenu(item.name)}
+                    className={`
+                      w-full group relative flex items-center p-1.5 rounded-xl
+                      transition-all duration-300 ease-in-out
+                      ${
+                        isParentActive && !collapsed
+                          ? "bg-slate-50 text-slate-900 font-medium" 
+                          : "text-slate-600 hover:bg-slate-50/70"
+                      }
+                    `}
+                  >
+                    <div
+                      className={`
+                        p-1.5 rounded-lg transition-all duration-300 flex-shrink-0
+                        ${isParentActive ? "bg-slate-200/60 text-slate-800" : "bg-slate-50 group-hover:bg-white text-slate-500"}
+                      `}
+                    >
+                      <Icon size={16} />
+                    </div>
+
+                    <span
+                      className={`
+                        ml-2.5 font-medium text-xs whitespace-nowrap transition-all duration-300 ease-in-out
+                        ${collapsed ? "opacity-0 translate-x-[-10px] pointer-events-none" : "opacity-100 translate-x-0"}
+                      `}
+                    >
+                      {item.name}
+                    </span>
+
+                    {/* Chevron Indicator */}
+                    {!collapsed && (
+                      <ChevronDown
+                        size={14}
+                        className={`ml-auto text-slate-400 transition-transform duration-300 ${
+                          isSubmenuOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </button>
+
+                  {/* Smooth Animated Height Submenu Container */}
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isSubmenuOpen && !collapsed
+                        ? "grid-rows-[1fr] opacity-100 mt-0.5"
+                        : "grid-rows-[0fr] opacity-0 pointer-events-none"
+                    }`}
+                  >
+                    <div className="overflow-hidden space-y-0.5 pl-9 pr-2">
+                      {item.subItems.map((sub) => {
+                        const isChildActive = pathname === sub.link;
+                        return (
+                          <Link
+                            key={sub.link}
+                            href={sub.link}
+                            className={`
+                              flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-medium transition-all duration-200
+                              ${
+                                isChildActive
+                                  ? "text-slate-900 bg-slate-100 font-semibold"
+                                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                              }
+                            `}
+                          >
+                            <Circle 
+                              size={5} 
+                              className={isChildActive ? "fill-slate-800 stroke-slate-800" : "fill-slate-300 stroke-slate-300"} 
+                            />
+                            <span className="whitespace-nowrap">{sub.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // Normal Top Level Link Item (No children)
             return (
               <Link
                 key={item.link}
                 href={item.link}
                 className={`
-                  group relative flex items-center gap-4
-                  px-4 py-3 rounded-2xl
-                  transition-all duration-300
+                  group relative flex items-center p-1.5 rounded-xl
+                  transition-all duration-300 ease-in-out
                   ${
-                    active
-                      ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg"
-                      : "text-slate-600 hover:bg-slate-100"
+                    isParentActive
+                      ? "bg-slate-50 text-slate-900 font-semibold"
+                      : "text-slate-600 hover:bg-slate-50/70"
                   }
                 `}
               >
-                {/* Active Indicator */}
-                {active && (
-                  <span className="absolute left-0 top-2 bottom-2 w-1 bg-white rounded-r-full" />
+                {isParentActive && (
+                  <span className="absolute left-0 top-2 bottom-2 w-0.5 bg-slate-900 rounded-r-full" />
                 )}
 
                 <div
                   className={`
-                    p-2 rounded-xl transition
+                    p-1.5 rounded-lg transition-all duration-300 flex-shrink-0
                     ${
-                      active
-                        ? "bg-white/20"
-                        : "bg-slate-100 group-hover:bg-white"
+                      isParentActive
+                        ? "bg-slate-200/60 text-slate-800"
+                        : "bg-slate-50 group-hover:bg-white text-slate-500"
                     }
                   `}
                 >
-                  <Icon size={18} />
+                  <Icon size={16} />
                 </div>
 
-                {!collapsed && <span className="font-medium">{item.name}</span>}
+                <span
+                  className={`
+                    ml-2.5 whitespace-nowrap transition-all duration-300 ease-in-out
+                    ${collapsed ? "opacity-0 translate-x-[-10px] pointer-events-none" : "opacity-100 translate-x-0"}
+                  `}
+                >
+                  {item.name}
+                </span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Bottom Section */}
-        <div className="absolute bottom-6 left-0 right-0 px-4">
+        {/* Bottom Section (Logout) */}
+        <div className="absolute bottom-3 left-0 right-0 px-3">
           <button
             onClick={onLogout}
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500
-              text-white font-medium
-              shadow-lg
-              hover:scale-[1.02]
-              transition-all duration-300
+            className={`
+              flex items-center justify-center gap-2 w-full bg-white dark:bg-slate-950 
+              border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 
+              hover:shadow-sm text-slate-600 dark:text-slate-400 hover:text-red-600
+              transition-all outline-none active:scale-[0.98]
             `}
           >
-            <LogOut size={18} />
-            {!collapsed && "Logout"}
+            <div className="flex-shrink-0">
+              <LogOut size={16} />
+            </div>
+            <span
+              className={`
+                whitespace-nowrap font-medium text-xs transition-all duration-300 ease-in-out
+                ${collapsed ? "w-0 opacity-0 ml-0 pointer-events-none" : "w-auto opacity-100 ml-1"}
+              `}
+            >
+              Logout
+            </span>
           </button>
         </div>
       </aside>
