@@ -68,7 +68,7 @@ export default function BlogsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 dark:text-white"
+            className="text-3xl sm:text-4xl font-black tracking-tight text-blue-400 dark:text-white"
           >
             Latest Blogs
           </motion.h2>
