@@ -13,97 +13,87 @@ import {
 } from "react-icons/fa";
 
 export default function Footer() {
-  // Smooth Scroll
   const handleScrollClick = (e, href) => {
     e.preventDefault();
-
     const target = document.querySelector(href);
-
     if (target) {
-      target.scrollIntoView({
+      const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - 70;
+      window.scrollTo({
+        top: offsetPosition,
         behavior: "smooth",
       });
     }
   };
 
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer className="relative bg-gradient-to-b from-slate-900 to-black text-white overflow-hidden">
-      
-      {/* Top Glow */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-cyan-500/40"></div>
+    <footer className="relative bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white overflow-hidden border-t border-slate-800/60">
+      {/* Decorative Top Glow Bar */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        
-        {/* Main Grid */}
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-12">
-
-          {/* Company */}
-          <div>
-            <div className="flex items-center gap-3">
-              <Image
-                src="/images/sharma-tech.png"
-                alt="Sharma Technologies"
-                width={65}
-                height={65}
-                className="object-contain"
-              />
-
-              <div>
-                {/* <h2 className="text-2xl font-bold">
-                  Sharma Technologies
-                </h2>
-
-                <p className="text-cyan-400 text-sm">
-                  Software & Digital Solutions
-                </p> */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
+        {/* Main Links Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+          
+          {/* Column 1: Brand & Identity */}
+          <div className="flex flex-col space-y-5">
+            <div className="flex items-center gap-3 group cursor-pointer" onClick={(e) => handleScrollClick(e, "#home")}>
+              <div className="relative w-14 h-14 bg-slate-800/40 p-1.5 rounded-2xl border border-slate-700/30 transition-transform duration-300 group-hover:scale-105">
+                <Image
+                  src="/images/sharma-tech.png"
+                  alt="Sharma Technologies Logo"
+                  fill
+                  className="object-contain p-1.5"
+                />
               </div>
+              
             </div>
 
-            <p className="mt-6 text-gray-400 leading-relaxed text-sm">
-              We build scalable software, IoT systems, cloud platforms,
-              mobile applications, and modern digital experiences for
-              startups and enterprises worldwide.
+            <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
+              We build scalable software, cloud platforms, robust IoT networks, mobile ecosystems, and modern digital automation solutions tailored for modern global enterprise performance.
             </p>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-4 mt-6">
+            {/* Social Connection Badges */}
+            <div className="flex items-center gap-3 pt-2">
               {[
-                FaFacebookF,
-                FaLinkedinIn,
-                FaGithub,
-                FaTwitter,
-              ].map((Icon, index) => (
+                { Icon: FaFacebookF, label: "Facebook link", url: "#" },
+                { Icon: FaLinkedinIn, label: "LinkedIn link", url: "#" },
+                { Icon: FaGithub, label: "GitHub link", url: "#" },
+                { Icon: FaTwitter, label: "Twitter link", url: "#" },
+              ].map(({ Icon, label, url }, index) => (
                 <a
                   key={index}
-                  href="#"
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-cyan-500 flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  href={url}
+                  aria-label={label}
+                  className="w-9 h-9 rounded-xl bg-slate-800/60 border border-slate-700/40 hover:border-cyan-500/50 text-slate-400 hover:text-white hover:bg-cyan-500 flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/20"
                 >
-                  <Icon size={16} />
+                  <Icon size={14} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Column 2: Nav Maps */}
           <div>
-            <h3 className="text-xl font-semibold mb-6">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-200 mb-5 relative pl-3 border-l-2 border-cyan-500">
               Quick Links
             </h3>
-
-            <ul className="space-y-4 text-gray-400">
+            <ul className="space-y-3 text-sm text-slate-400 font-medium">
               {[
                 ["Home", "#home"],
-                ["About", "#about"],
                 ["Services", "#services"],
                 ["Portfolio", "#portfolio"],
+                ["Blog", "#blog"],
                 ["Contact", "#contact"],
               ].map(([label, href], index) => (
                 <li key={index}>
                   <a
                     href={href}
                     onClick={(e) => handleScrollClick(e, href)}
-                    className="hover:text-cyan-400 transition duration-300"
+                    className="inline-flex items-center gap-0.5 hover:text-cyan-400 transition-colors duration-200 group"
                   >
+                    <span className="opacity-0 w-0 group-hover:w-2 group-hover:opacity-100 transition-all duration-200 text-cyan-400 font-bold">&middot;</span>
                     {label}
                   </a>
                 </li>
@@ -111,113 +101,83 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Column 3: Specialized Capabilities */}
           <div>
-            <h3 className="text-xl font-semibold mb-6">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-200 mb-5 relative pl-3 border-l-2 border-cyan-500">
               Services
             </h3>
-
-            <ul className="space-y-4 text-gray-400">
-              <li className="hover:text-cyan-400 transition">
-                Web Development
-              </li>
-
-              <li className="hover:text-cyan-400 transition">
-                Mobile App Development
-              </li>
-
-              <li className="hover:text-cyan-400 transition">
-                Cloud Solutions
-              </li>
-
-              <li className="hover:text-cyan-400 transition">
-                IoT Systems
-              </li>
-
-              <li className="hover:text-cyan-400 transition">
-                SEO Optimization
-              </li>
-
-              <li className="hover:text-cyan-400 transition">
-                Digital Marketing
-              </li>
+            <ul className="space-y-3 text-sm text-slate-400 font-medium">
+              {[
+                "Web Application Development",
+                "Mobile App Infrastructure",
+                "Cloud Solutions & DevOps",
+                "Enterprise IoT Systems",
+                "AI & Predictive Systems",
+                "Digital Transformation"
+              ].map((service, index) => (
+                <li key={index} className="hover:text-cyan-400 transition-colors duration-200 cursor-pointer">
+                  {service}
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-xl font-semibold mb-6">
-              Contact
-            </h3>
+          {/* Column 4: Communication Endpoints */}
+          <div className="flex flex-col justify-between">
+            <div>
+              <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-200 mb-5 relative pl-3 border-l-2 border-cyan-500">
+                Contact
+              </h3>
+              
+              <div className="space-y-3.5 text-sm text-slate-400 font-medium">
+                <a href="mailto:info@sharmatechnologies.com" className="flex items-center gap-3 group outline-none">
+                  <div className="w-8 h-8 rounded-lg bg-slate-800/40 border border-slate-700/30 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                    <FaEnvelope size={12} />
+                  </div>
+                  <span className="group-hover:text-cyan-400 transition-colors truncate">info@sharmatechnologies.com</span>
+                </a>
 
-            <div className="space-y-5 text-gray-400">
+                <a href="tel:+9779705130627" className="flex items-center gap-3 group outline-none">
+                  <div className="w-8 h-8 rounded-lg bg-slate-800/40 border border-slate-700/30 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                    <FaPhone size={12} />
+                  </div>
+                  <span className="group-hover:text-cyan-400 transition-colors tracking-wide">(+977) 9705130627</span>
+                </a>
 
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                  <FaEnvelope className="text-cyan-400" />
-                </div>
-
-                <span className="text-sm">
-                  info@sharmatechnologies.com
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                  <FaPhone className="text-cyan-400" />
-                </div>
-
-                <span className="text-sm">
-                  (+977) 9705130627
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                  <FaPhone className="text-cyan-400" />
-                </div>
-
-                <span className="text-sm">
-                  (+91) 8882930206
-                </span>
+                <a href="tel:+918882930206" className="flex items-center gap-3 group outline-none">
+                  <div className="w-8 h-8 rounded-lg bg-slate-800/40 border border-slate-700/30 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-all">
+                    <FaPhone size={12} />
+                  </div>
+                  <span className="group-hover:text-cyan-400 transition-colors tracking-wide">(+91) 8882930206</span>
+                </a>
               </div>
             </div>
 
-            {/* Back To Top */}
-            <button
-              onClick={() =>
-                window.scrollTo({
-                  top: 0,
-                  behavior: "smooth",
-                })
-              }
-              className="mt-8 flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 px-5 py-3 rounded-full text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-cyan-500/30"
-            >
-              <FaArrowUp />
-              Back to Top
-            </button>
+            {/* Float Return Navigation Triggers */}
+            <div className="pt-6">
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 shadow-md shadow-cyan-950/50 hover:shadow-cyan-500/20 active:scale-95 group outline-none"
+              >
+                <FaArrowUp className="text-[10px] transition-transform duration-300 group-hover:-translate-y-0.5" />
+                Back to Top
+              </button>
+            </div>
           </div>
+
         </div>
 
-        {/* Bottom */}
-        <div className="border-t border-white/10 mt-14 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-sm">
-          
-          <p>
-            © 2026 Sharma Technologies. All rights reserved.
+        {/* Bottom Panel Layout Section */}
+        <div className="border-t border-slate-800/50 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500">
+          <p className="text-center sm:text-left">
+            &copy; {currentYear} Sharma Technologies. All rights reserved.
           </p>
 
           <div className="flex items-center gap-6">
-            <Link
-              href="#"
-              className="hover:text-cyan-400 transition"
-            >
+            <Link href="#" className="hover:text-cyan-400 transition-colors">
               Privacy Policy
             </Link>
-
-            <Link
-              href="#"
-              className="hover:text-cyan-400 transition"
-            >
+            <Link href="#" className="hover:text-cyan-400 transition-colors">
               Terms & Conditions
             </Link>
           </div>
