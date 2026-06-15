@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
+import Image  from "next/image";
 // Initial mock data for users
 const INITIAL_USERS = [
   { id: "USR-9021", name: "Olivia Vance", email: "olivia@company.com", role: "Admin", status: "Active", joined: "Jan 12, 2026", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" },
@@ -82,7 +82,7 @@ export default function ManageUsersPage() {
       try {
         const res = await fetch("/api/auth/users");
         const data = await res.json();
-        setUsers(data.users || data); // depends on your API response
+        setUsers(data.users || data); 
       } catch (error) {
         console.error("Failed to fetch users:", error);
       } finally {
@@ -161,9 +161,15 @@ export default function ManageUsersPage() {
                   ))
                 ) : (
                   users.map((user) => (
-                    <tr key={user._id} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200">
-                      <td className="py-4 px-6 flex items-center gap-3">
-                        <img src={user?.avatarUrl || '/images/prof_profile.png'} alt={user.name} className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 group-hover:scale-105 transition-transform" />
+                    <tr key={user?._id} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200">
+                      <td className="py-4 px-6 flex items-center gap-3">                        
+                        <Image
+                          src={user?.avatarUrl || "/default-avatar.png"}
+                          alt="User"
+                          width={50}
+                          height={50}
+                          className ={`w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 group-hover:scale-105 transition-transform`}
+                        />
                         <div>
                           <span className="font-semibold text-slate-800 dark:text-slate-100 block group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{user.name}</span>
                           <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">{user.email}</span>

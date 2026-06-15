@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import toast from 'react-hot-toast';
 import {
   LayoutDashboard,
   Image,
@@ -60,11 +61,15 @@ export default function Sidebar({
       if (res.ok) {
         localStorage.removeItem("user");
         sessionStorage.clear();
-
-        router.push("/");
-        router.refresh();
+        toast.success('Logged Out Successfull!');
+        setTimeout(()=>{
+          router.push("/");
+          router.refresh();
+        },500);
+       
       }
     } catch (error) {
+      toast.error("Error :", error);
       console.error(error);
     }
   };

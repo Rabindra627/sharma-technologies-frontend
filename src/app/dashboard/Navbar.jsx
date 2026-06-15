@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from 'next/image';
 import {
   Menu,
   Bell,
@@ -174,7 +175,7 @@ useEffect(() => {
               aria-expanded={isOpen}
               aria-haspopup="true"
             >
-              <img
+              <Image
                 src={user?.avatarUrl || user?.avatarUrl}
                 alt={`profile`}
                 className="
@@ -208,7 +209,7 @@ useEffect(() => {
                 <div className="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/20 rounded-t-2xl">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Signed In As</p>
                   <div className="flex items-center gap-3">
-                    <img
+                    <Image
                       src={user?.avatarUrl || user?.avatarUrl}
                       alt={'profile'}
                       className="w-8 h-8 rounded-lg object-cover"

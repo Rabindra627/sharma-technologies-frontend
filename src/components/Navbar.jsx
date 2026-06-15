@@ -88,10 +88,6 @@ export default  function Navbar() {
 
       const data = await res.json();      
       if (res.ok) {          
-        if (data.user.token) {
-          localStorage.setItem("user", JSON.stringify(data.user));
-        }
-
         setForm({
           name: "",
           email: "",
@@ -100,14 +96,20 @@ export default  function Navbar() {
 
         setErrors({});
         setModalOpen(false);
-        setMobileMenuOpen(false);
-        toast.success(data.message);
+        setMobileMenuOpen(false);        
         if(isLogin){          
+          toast.success(data.message);
+          if (data.user.token) {
+            localStorage.setItem("user", JSON.stringify(data.user));
+          }
+
           setTimeout(() =>{
             router.push("/dashboard");
           },1500);
           
-        }        
+        }else{          
+          toast.success(data.message);          
+        }     
       } else {
         if (res.error) {
           setErrors(res.error);
