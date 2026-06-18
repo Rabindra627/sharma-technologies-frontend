@@ -2,7 +2,7 @@ import DashboardCards from "@/app/dashboard/DashboardCards"
 import AnalyticsPage from "@/app/dashboard/AnalyticsPage"
 
 export default function Dashboard() {
-
+ 
   return (
 
     <div>

@@ -1,34 +1,57 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Briefcase, FolderKanban, Mail, Users, TrendingUp } from "lucide-react";
 
 export default function DashboardCards() {
+
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalEnquiries: 0,
+    totalProjects: 0,
+    totalClients: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/auth/stats");
+        const data = await res.json();
+
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const cards = [
     {
       title: "Users",
-      count: "8,240",
+      count: stats.totalUsers,
       growth: "+12%",
       icon: Users,
       color: "from-violet-500 to-purple-600",
     },
     {
       title: "Enquiries",
-      count: "24",
+      count: stats.totalEnquiries,
       growth: "+18%",
       icon: Mail,
       color: "from-cyan-500 to-blue-600",
     },
     {
       title: "Projects",
-      count: "12",
+      count: stats.totalProjects,
       growth: "+7%",
       icon: FolderKanban,
       color: "from-orange-500 to-red-500",
     },
     {
       title: "Clients",
-      count: "12",
+      count: stats.totalClients,
       growth: "+22%",
       icon: Briefcase,
       color: "from-emerald-500 to-green-600",
@@ -57,7 +80,9 @@ export default function DashboardCards() {
                 <p className="text-slate-500 text-sm">{card.title}</p>
 
                 <h3 className="text-2xl font-bold mt-3 text-slate-800">
-                  {card.count}
+                  {card.count || 0}
+
+                  
                 </h3>
 
                 <div className="flex items-center gap-1 mt-1 text-green-500">
