@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+// import { format } from 'date-fns';
 
 // Mock Data for Incoming Customer/Client Enquiries
 const INITIAL_ENQUIRIES = [
@@ -16,11 +17,50 @@ export default function EnquiriesPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [filterStage, setFilterStage] = useState("All");
+  
+  // FIXED: Declared missing error state variables
+  const [error, setError] = useState(null);
+
+  // Fetch data from your API on component mount
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    const fetchEnquiries = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await fetch("/api/auth/getEnquiries", { signal: controller.signal });
+        const json = await response.json();
+
+        if (json.success && Array.isArray(json.data)) {
+          // Update the state with the fetched array
+          console.log(json.data)
+          setEnquiries(json.data);
+        } else {
+          setError(json.message || "Something went wrong fetching data.");
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setError(err.message || "Failed to connect to the server");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEnquiries();
+
+    // Cleanup abort execution if component unmounts early
+    return () => controller.abort();
+  }, []);
+
+  // const formattedDate = format(new Date("2026-06-18T08:12:53.965Z"), "dd MM yyyy HH:mm:ss");
 
   // Smooth UI Loader Refresh Sequence
   const handleRefresh = () => {
     setIsRefreshing(true);
     setIsLoading(true);
+    setError(null);
     setTimeout(() => {
       setIsRefreshing(false);
       setIsLoading(false);
@@ -31,14 +71,14 @@ export default function EnquiriesPage() {
   // Archive / Delete Handler
   const handleArchive = (id, e) => {
     e.stopPropagation(); // Avoid triggering row selections
-    setEnquiries(enquiries.filter(item => item.id !== id));
+    setEnquiries(prev => prev.filter(item => item.id !== id));
     if (selectedEnquiry?.id === id) setSelectedEnquiry(null);
   };
 
   // Stage Advancement Triage Handler
   const updateStage = (id, nextStage) => {
-    setEnquiries(enquiries.map(item => item.id === id ? { ...item, stage: nextStage } : item));
-    if (selectedEnquiry?.id === id) setSelectedEnquiry({ ...selectedEnquiry, stage: nextStage });
+    setEnquiries(prev => prev.map(item => item.id === id ? { ...item, stage: nextStage } : item));
+    if (selectedEnquiry?.id === id) setSelectedEnquiry(prev => ({ ...prev, stage: nextStage }));
   };
 
   const getPriorityStyle = (priority) => {
@@ -59,7 +99,8 @@ export default function EnquiriesPage() {
     }
   };
 
-  const filteredEnquiries = enquiries.filter(enq => filterStage === "All" || enq.stage === filterStage);
+  // Handle safe mapping check in case filteredEnquiries evaluates undefined
+  const filteredEnquiries = (enquiries || []).filter(enq => filterStage === "All" || enq.stage === filterStage);
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-10 dark:bg-slate-950 text-slate-900 dark:text-slate-50 relative overflow-x-hidden selection:bg-blue-500/10">
@@ -99,6 +140,13 @@ export default function EnquiriesPage() {
           </div>
         </div>
 
+        {/* Error Alert Display Block */}
+        {error && (
+          <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200/50 text-rose-800 dark:text-rose-400 text-sm font-medium">
+             ⚠️ {error}
+          </div>
+        )}
+
         {/* --- DESKTOP FLUID ROW TABLE (lg: screen visibility breakpoint) --- */}
         <div className="hidden lg:block bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
           <div className="overflow-x-auto">
@@ -137,8 +185,8 @@ export default function EnquiriesPage() {
                       className={`group cursor-pointer transition-all duration-200 hover:bg-slate-50/80 dark:hover:bg-slate-800/20 ${enq.stage === "Unread" ? "bg-blue-500/[0.02] font-medium" : ""}`}
                     >
                       <td className="py-4 px-6">
-                        <span className="font-semibold text-slate-800 dark:text-slate-100 block group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{enq.sender}</span>
-                        <span className="text-xs text-slate-400 dark:text-slate-500">{enq.company}</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-100 block group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{enq.name}</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">{enq.email || 'First User'}</span>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2 max-w-md">
@@ -149,10 +197,10 @@ export default function EnquiriesPage() {
                       </td>
                       <td className="py-4 px-6">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getPriorityStyle(enq.priority)}`}>
-                          {enq.priority}
+                          {enq.priority || 'HIGH'}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-slate-400 dark:text-slate-500 whitespace-nowrap">{enq.date}</td>
+                      <td className="py-4 px-6 text-slate-400 dark:text-slate-500 whitespace-nowrap">{enq.createdAt}</td>
                       <td className="py-4 px-6 text-right">
                         <button 
                           onClick={(e) => handleArchive(enq.id, e)}
@@ -264,7 +312,7 @@ export default function EnquiriesPage() {
                   <span className="text-xs text-slate-500 dark:text-slate-400">{selectedEnquiry.company}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
-                  <span className="text-slate-400">{selectedEnquiry.date}</span>
+                  <span className="text-slate-400">{selectedEnquiry.createdAt}</span>
                   <span className={`px-2.5 py-0.5 text-xxs font-extrabold uppercase rounded-full border ${getPriorityStyle(selectedEnquiry.priority)}`}>
                     {selectedEnquiry.priority} Priority
                   </span>
