@@ -64,7 +64,7 @@ export default function EnquiriesPage() {
     setTimeout(() => {
       setIsRefreshing(false);
       setIsLoading(false);
-      setEnquiries(INITIAL_ENQUIRIES);
+      setEnquiries(enquiries);
     }, 800);
   };
 
@@ -180,7 +180,7 @@ export default function EnquiriesPage() {
                 ) : (
                   filteredEnquiries.map((enq) => (
                     <tr 
-                      key={enq.id} 
+                      key={enq._id} 
                       onClick={() => setSelectedEnquiry(enq)}
                       className={`group cursor-pointer transition-all duration-200 hover:bg-slate-50/80 dark:hover:bg-slate-800/20 ${enq.stage === "Unread" ? "bg-blue-500/[0.02] font-medium" : ""}`}
                     >

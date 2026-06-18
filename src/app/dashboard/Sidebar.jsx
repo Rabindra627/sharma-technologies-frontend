@@ -53,9 +53,12 @@ export default function Sidebar({
       ]
     },
     { 
-      name: "Inquiries", 
-      link: "/dashboard/inquiries", 
-      icon: Mail 
+      name: "Inquiries",       
+      icon: Mail,
+      hasSubmenu : true,
+      subItems : [
+        {name : "Active Enquiry", link: "/dashboard/inquiries"}
+      ] 
     },
     { 
       name: "Projects", 
@@ -67,9 +70,12 @@ export default function Sidebar({
       ]
     },
     { 
-      name: "Clients", 
-      link: "/dashboard/clients", 
-      icon: Briefcase 
+      name: "Clients",       
+      icon: Briefcase ,
+      hasSubmenu : true,
+      subItems: [
+        {name: 'All Clients', link: "/dashboard/clients"}
+      ]
     },
   ];
 
