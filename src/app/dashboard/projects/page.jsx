@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 // Initial mock data
 const INITIAL_PROJECTS = [
@@ -21,10 +22,10 @@ export default function ProjectsTablePage() {
   // New Project Form State
   const [formData, setFormData] = useState({
     name: "",
-    category: "Frontend",
+    category: "",
     client: "",
     budget: "",
-    status: "In Progress"
+    status: ""
   });
 
   // Simulated Refresh Action
@@ -34,7 +35,7 @@ export default function ProjectsTablePage() {
     setTimeout(() => {
       setIsRefreshing(false);
       setIsLoading(false);
-      setProjects(INITIAL_PROJECTS);
+      setProjects(projects);
     }, 900);
   };
 
@@ -43,26 +44,96 @@ export default function ProjectsTablePage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  // Create Project Submission
-  const handleFormSubmit = (e) => {
+  // handled projects submission
+  // Create Project Submission with API Integration
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    
+    // Guard clause using your local form state keys
     if (!formData.name || !formData.client) return; 
 
-    const newId = `PRJ-00${projects.length + 1}`;
-    const newProject = {
-      id: newId,
-      name: formData.name,
-      category: formData.category,
-      status: formData.status,
-      client: formData.client,
-      budget: formData.budget.startsWith("$") ? formData.budget : `$${formData.budget}`
+    try {
+      // 1. Fire the POST request to your App Router backend endpoint
+      const response = await fetch("/api/auth/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          // Corrected keys to precisely match your Mongoose Model configuration
+          "projectName": formData.name,
+          "category": formData.category,
+          "initialStatus": formData.status,
+          "clientPartner": formData.client,
+          "budgetAllocation": Number(formData.budget.replace(/[^0-9.]/g, "")) // Strips "$" or commas cleanly to match Mongoose Numbers
+        }),
+      });
+
+      const result = await response.json();      
+      if(result.success){
+        toast.success(result.message);
+      }
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to instantiate project asset.");
+      }
+
+      // 2. Map the MongoDB response data safely back into your client state format
+      const createdProject = {
+        id: result.data._id, // Uses the real MongoDB Object ID
+        name: result.data.projectName,
+        category: result.data.category,
+        status: result.data.initialStatus,
+        client: result.data.clientPartner,
+        budget: `$${result.data.budgetAllocation.toLocaleString()}`
+      };
+
+      // 3. Prepend the live saved project context into view and close the modal
+      setProjects([createdProject, ...projects]);
+      setFormData({ name: "", category: "", client: "", budget: "", status: "In Progress" });
+      setIsModalOpen(false);
+
+    } catch (error) {
+      console.error("Project dispatch transmission failure:", error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  // Fetch projects from the API on component mount
+  React.useEffect(() => {
+    const fetchProjects = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("/api/auth/projects");
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // Map the MongoDB data format to your table's state format
+          const mappedProjects = result.data.map((project) => ({
+            id: project._id,
+            name: project.projectName,
+            category: project.category,
+            status: project.initialStatus,
+            client: project.clientPartner,
+            budget: typeof project.budgetAllocation === "number" 
+              ? `$${project.budgetAllocation.toLocaleString()}` 
+              : project.budgetAllocation
+          }));
+          
+          setProjects(mappedProjects);
+        } else {
+          console.error("Failed to load registry assets:", result.error);
+        }
+      } catch (error) {
+        console.error("Network communication failure during fetch:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    setProjects([newProject, ...projects]);
-    setFormData({ name: "", category: "Frontend", client: "", budget: "", status: "In Progress" });
-    setIsModalOpen(false);
-  };
+    fetchProjects();
+  }, []); // Empty dependency array ensures this fires exactly once when the page loads
+
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -317,7 +388,7 @@ export default function ProjectsTablePage() {
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">Budget Allocation</label>
                 <input
-                  type="text"
+                  type="number"
                   name="budget"
                   value={formData.budget}
                   onChange={handleInputChange}
