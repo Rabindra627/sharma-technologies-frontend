@@ -35,7 +35,7 @@ export default function Hero() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight sm:leading-none"
           >
-            Build Future With <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</span>
+            Build Future And Grow Your Business With <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</span>
           </motion.h1>
 
           <motion.p
@@ -44,7 +44,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
             className="text-sm sm:text-base md:text-lg font-semibold tracking-wider text-cyan-200 uppercase"
           >
-            Custom Software • Web Development • IoT Systems • AI Solutions
+            Custom Software • Web Development • Mobile App Development • IoT Systems • AI Solutions
           </motion.p>
 
           <motion.p
