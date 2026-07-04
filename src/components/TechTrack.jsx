@@ -46,6 +46,41 @@ export default function TechTrack() {
       bgLight: "bg-amber-50",
       textColor: "text-amber-600"
     },
+    {
+      name: "Spring Boot", 
+      percentage: 20,
+      colorClass: "bg-amber-500",
+      bgLight: "bg-amber-50",
+      textColor: "text-amber-600"
+    },
+    {
+      name: "Hibernate", 
+      percentage: 20,
+      colorClass: "bg-amber-500",
+      bgLight: "bg-amber-50",
+      textColor: "text-amber-600"
+    },
+    {
+      name: "SQL Server", 
+      percentage: 75,
+      colorClass: "bg-amber-500",
+      bgLight: "bg-amber-50",
+      textColor: "text-amber-600"
+    },
+    {
+      name: "ORACLE", 
+      percentage: 55,
+      colorClass: "bg-purple-400",
+      bgLight: "bg-purple-50",
+      textColor: "text-purple-600"
+    },
+    {
+      name: "Node.js", 
+      percentage: 60,
+      colorClass: "bg-emerald-500",
+      bgLight: "bg-emerald-50",
+      textColor: "text-emerald-600"
+    }
   ];
 
   // Container configuration for smooth staggered item reveals
