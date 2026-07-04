@@ -44,7 +44,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
             className="text-sm sm:text-base md:text-lg font-semibold tracking-wider text-cyan-200 uppercase"
           >
-            Custom Software • Web Development • Mobile App Development • IoT Systems • AI Solutions
+            Custom Software • Web Development • Mobile App Development • Enterprise Solutions
           </motion.p>
 
           <motion.p
@@ -53,9 +53,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             className="text-sm sm:text-base md:text-lg text-white/90 font-normal leading-relaxed text-justify lg:text-left"
           >            
-            <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</span> is a software development company specializing in innovative web
+          <span className="block sm:inline text-uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</span> is a software development company specializing in innovative web
             applications, mobile applications, enterprise software solutions,
-            cloud computing, IoT systems, and digital transformation services.
+            cloud computing, and digital transformation services.
             We help businesses improve efficiency, enhance customer experiences,
             and achieve growth through modern technology solutions.
           </motion.p>
