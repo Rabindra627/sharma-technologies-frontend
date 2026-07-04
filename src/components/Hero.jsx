@@ -53,7 +53,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             className="text-sm sm:text-base md:text-lg text-white/90 font-normal leading-relaxed text-justify lg:text-left"
           >            
-            <strong className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</strong> is a software development company specializing in innovative web
+            <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</span> is a software development company specializing in innovative web
             applications, mobile applications, enterprise software solutions,
             cloud computing, IoT systems, and digital transformation services.
             We help businesses improve efficiency, enhance customer experiences,
