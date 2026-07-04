@@ -52,8 +52,8 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             className="text-sm sm:text-base md:text-lg text-white/90 font-normal leading-relaxed text-justify lg:text-left"
-          >
-            <strong className="font-semibold text-white">Sharma Technologies</strong> is a software development company specializing in innovative web
+          >            
+            <strong className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-cyan-200">Sharma Technologies</strong> is a software development company specializing in innovative web
             applications, mobile applications, enterprise software solutions,
             cloud computing, IoT systems, and digital transformation services.
             We help businesses improve efficiency, enhance customer experiences,
