@@ -49,30 +49,30 @@ export default function TechTrack() {
     {
       name: "Spring Boot", 
       percentage: 20,
-      colorClass: "bg-amber-500",
-      bgLight: "bg-amber-50",
-      textColor: "text-amber-600"
+      colorClass: "bg-cyan-500",
+      bgLight: "bg-cyan-50",
+      textColor: "text-cyan-600"
     },
     {
       name: "Hibernate", 
-      percentage: 20,
-      colorClass: "bg-amber-500",
-      bgLight: "bg-amber-50",
-      textColor: "text-amber-600"
+      percentage: 30,
+      colorClass: "bg-cyan-500",
+      bgLight: "bg-cyan-50",
+      textColor: "text-cyan-600"
     },
     {
       name: "SQL Server", 
       percentage: 75,
-      colorClass: "bg-amber-500",
-      bgLight: "bg-amber-50",
-      textColor: "text-amber-600"
+      colorClass: "bg-orange-500",
+      bgLight: "bg-orange-50",
+      textColor: "text-orange-600"
     },
     {
       name: "ORACLE", 
       percentage: 55,
-      colorClass: "bg-purple-400",
-      bgLight: "bg-purple-50",
-      textColor: "text-purple-600"
+      colorClass: "bg-fuchsia-500",
+      bgLight: "bg-fuchsia-50",
+      textColor: "text-fuchsia-600"
     },
     {
       name: "Node.js", 
