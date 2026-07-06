@@ -279,7 +279,7 @@ export default function Sidebar({
         </nav>
 
         {/* Bottom Section (Logout) */}
-        <div className="absolute bottom-3 left-0 right-0 px-3">
+        {/* <div className="absolute bottom-3 left-0 right-0 px-3">
           <button
             onClick={onLogout}
             className={`
@@ -301,7 +301,7 @@ export default function Sidebar({
               Logout
             </span>
           </button>
-        </div>
+        </div> */}
       </aside>
     </>
   );

@@ -2,12 +2,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from 'next/image';
+import toast from 'react-hot-toast';
+import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
   Bell,
   Search,
   ChevronDown,
 } from "lucide-react";
+
 
 export default function Navbar({
   setCollapsed,
@@ -17,6 +20,8 @@ export default function Navbar({
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
+  const router = useRouter();
+  const pathname = usePathname();
   // Mock Active User Data matching your interface layout
   const currentUser = {
     name: "Rabindra Sharma",
@@ -54,6 +59,26 @@ useEffect(() => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
+
+  // Logout functionality
+  const onLogout = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (res.ok) {
+        localStorage.removeItem("user");
+        sessionStorage.clear();
+        toast.success('Logged Out Successfully!');
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 500);
+      }
+    } catch (error) {
+      toast.error("Error logging out");
+      console.error(error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40">
@@ -254,10 +279,12 @@ useEffect(() => {
                 {/* Session Termination Button Divider */}
                 <div className="p-1.5 border-t border-slate-100 dark:border-slate-800/80">
                   <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      alert("Ending dashboard session...");
-                    }}
+                    // onClick={() => {
+                    //   setIsOpen(false);
+                    //   alert("Ending dashboard session...");
+                      
+                    // }}
+                    onClick={onLogout}
                     className="flex w-full items-center gap-3 px-3 py-2 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10 transition-colors group text-left"
                   >
                     <svg className="w-4 h-4 text-rose-400 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
