@@ -116,7 +116,7 @@ export default async function BlogDetails({ params }) {
           <div className="relative max-w-4xl mx-auto  flex flex-col items-start justify-start text-start z-20 px-4">
             <Link
                 href="/#blog"
-                className="inline-flex py-20  gap-2 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition group"
+                className="inline-flex py-6  gap-2 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition group"
               >
                 <FaArrowLeft className="transform group-hover:-translate-x-1 transition duration-200" />
                 Back to Blogs
