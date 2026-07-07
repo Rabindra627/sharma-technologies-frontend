@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaCalendarAlt, FaUser } from "react-icons/fa";
 
+// Ensure all slugs are strictly lowercase to prevent routing lookup mismatches
 const blogs = [
   {
     title: "Smart IoT Buildings",
@@ -14,7 +15,7 @@ const blogs = [
     date: "Apr 6, 2026",
     author: "Rabindra Sharma",
     category: "IoT",
-    slug: "smart-IoT-buildings",
+    slug: "smart-iot-buildings", // Changed 'IoT' to 'iot'
   },
   {
     title: "AI in Healthcare",
@@ -80,7 +81,7 @@ export default function BlogsSection() {
           className="relative overflow-hidden rounded-3xl mb-12"
         >
           <Link href={`/blogs/${blogs[0].slug}`}>
-            <div className="grid lg:grid-cols-2 bg-white dark:bg-slate-800 shadow-xl">
+            <div className="grid lg:grid-cols-2 bg-white dark:bg-slate-800 shadow-xl cursor-pointer">
 
               <div className="relative h-[300px] lg:h-[500px]">
                 <Image
@@ -136,7 +137,7 @@ export default function BlogsSection() {
               viewport={{ once: true }}
             >
               <Link href={`/blogs/${blog.slug}`}>
-                <div className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full">
+                <div className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full cursor-pointer">
 
                   <div className="relative h-60 overflow-hidden">
                     <Image
