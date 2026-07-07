@@ -111,18 +111,16 @@ export default async function BlogDetails({ params }) {
           {/* MIDDLE TO BOTTOM SMOOTH DEEP BLEND */}
           <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10" />
           {/* Top Navigation Back Action */}
-            <div className="relative max-w-4xl py-20 flex flex-col items-start  z-20 px-8">
-              <Link
+         
+          {/* Hero Content Metadata Area (Perfectly Centered and Clear) */}
+          <div className="relative max-w-4xl mx-auto  flex flex-col items-start justify-start text-start z-20 px-4">
+            <Link
                 href="/#blog"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition group"
+                className="inline-flex py-20  gap-2 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition group"
               >
                 <FaArrowLeft className="transform group-hover:-translate-x-1 transition duration-200" />
                 Back to Blogs
               </Link>
-            </div>
-          {/* Hero Content Metadata Area (Perfectly Centered and Clear) */}
-          <div className="relative max-w-4xl mx-auto flex flex-col items-center justify-center text-center z-20 px-4">
-            
             <span className="bg-cyan-500 text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase shadow-md mb-6">
               {blog.category}
             </span>
