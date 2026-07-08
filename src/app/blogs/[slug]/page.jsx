@@ -94,6 +94,12 @@ export default function BlogDetails({ params }) {
   const resolvedParams = use(params);
   const slug = resolvedParams?.slug;
 
+  const dateObject = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",  // "short" -> Apr, "long" -> April
+    year: "numeric",
+  });
+
   useEffect(() => {      
     async function fetchBlogs() {
       try {        
@@ -164,7 +170,7 @@ export default function BlogDetails({ params }) {
 
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-sm">
                 <FaCalendarAlt className="text-cyan-400" />
-                {blog.date}
+                {dateObject.format(new Date(blog.createdAt))}
               </span>
 
               {blog.readTime && (
