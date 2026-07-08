@@ -10,7 +10,8 @@ export default function DashboardCards() {
     totalEnquiries: 0,
     totalProjects: 0,
     totalClients: 0,
-    totalBlogs: 0
+    totalBlogs: 0,
+    totalClients : 0
   });
 
   useEffect(() => {

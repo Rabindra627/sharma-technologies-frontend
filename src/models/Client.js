@@ -45,4 +45,4 @@ const ClientSchema = new mongoose.Schema(
 
 // Prevent Next.js hot-reloading from recompiling models repeatedly 
 export default mongoose.models.Client ||
- mongoose.model("Client", ClientSchema);
+ mongoose.model("Client", ClientSchema, "clients");
