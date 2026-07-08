@@ -8,93 +8,13 @@ import Footer from "@/components/Footer";
 import { FaUser, FaCalendarAlt, FaClock, FaArrowLeft } from "react-icons/fa";
 import { useState, useEffect, use } from "react";
 
-const blogs = [
-  {
-    title: "Smart IoT Buildings",
-    description:
-      "How IoT sensors and AI are transforming modern building management systems.",
-    image: "/images/IoT-smart.png",
-    date: "July 7, 2026",
-    author: "Rabindra Sharma",
-    category: "IoT",
-    readTime: "5 min read",
-    slug: "smart-iot-buildings",
-    content: `
-Smart buildings use IoT sensors, automation, and cloud technologies
-to optimize energy efficiency, security, and operational performance.
-
-Modern facilities integrate connected devices that continuously monitor
-temperature, humidity, occupancy, lighting, and HVAC systems.
-
-These systems generate real-time data which enables predictive
-maintenance and automated decision-making.
-
-Organizations can significantly reduce operating costs while
-improving sustainability and occupant comfort.
-
-The future of smart infrastructure will be powered by AI,
-edge computing, and cloud-based analytics platforms.
-`,
-  },
-  {
-    title: "AI in Healthcare",
-    description:
-      "Discover how artificial intelligence is revolutionizing patient care.",
-    image: "/images/health-care.png",
-    date: "May 5, 2026",
-    author: "Dr. John Doe",
-    category: "AI",
-    readTime: "6 min read",
-    slug: "ai-in-healthcare",
-    content: `
-Artificial intelligence is transforming healthcare by enabling
-faster diagnosis and personalized treatment.
-
-Machine learning algorithms help doctors analyze medical images,
-predict diseases, and improve patient outcomes.
-
-AI-powered systems also assist in drug discovery and clinical research.
-
-Hospitals are increasingly adopting intelligent healthcare solutions
-to enhance operational efficiency.
-`,
-  },
-  {
-    title: "Smart Traffic Systems",
-    description:
-      "Using sensors and machine learning for intelligent traffic management.",
-    image: "/images/smart-traffic.png",
-    date: "June 4, 2026",
-    author: "UrbanTech",
-    category: "Smart City",
-    readTime: "5 min read",
-    slug: "smart-traffic-systems",
-    content: `
-Smart traffic systems leverage advanced multi-sensor nodes alongside predictive cloud algorithms to reduce intersection wait-times, detect road incidents instantly, and dynamically route emergency services safely through dense urban districts.
-`,
-  },
-  {
-    title: "Web Development",
-    description:
-      "Building enterprise-grade applications with modern web technologies.",
-    image: "/images/webblog.png",
-    date: "June 4, 2026",
-    author: "Anand Sharma",
-    category: "Development",
-    readTime: "4 min read",
-    slug: "web-development",
-    content: `Web development is the process of building and maintaining websites and web applications. It includes everything from creating simple static pages to complex systems like e-commerce platforms, social networks, and enterprise solutions. In today’s digital world, having a strong online presence is essential for businesses and individuals alike. A well-designed website not only attracts users but also builds trust and drives growth.`,
-  },
-];
-
 export default function BlogDetails({ params }) {
-  const [blogData, setBlogData] = useState(blogs);
+  // Initialize as null since we aren't using a static array fallback anymore
+  const [blogData, setBlogData] = useState(null);
+  const [loading, setLoading] = useState(true);
   
-  // Safely unwrap params using React.use() to match modern Next.js patterns
   const resolvedParams = use(params);
   const slug = resolvedParams?.slug;
-
-  
 
   useEffect(() => {      
     async function fetchBlogs() {
@@ -102,32 +22,47 @@ export default function BlogDetails({ params }) {
         const response = await fetch("/api/blogs"); 
         const result = await response.json();
         
-        if (result.success && result.data && result.data.length > 0) {
+        if (result.success && result.data) {
           setBlogData(result.data);   
-               
         }
       } catch (err) {
-        console.error("API Fetch failed, using static fallback data:", err.message);
-      }                 
+        console.error("API Fetch failed:", err.message);
+      } finally {
+        setLoading(false);
+      }                
     }
     fetchBlogs();
   }, []);
 
-  const blog = blogData.find(
+  // 1. Render a clean loading UI while waiting for the API response
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
+          <p className="text-slate-600 dark:text-slate-400 font-medium">Loading article details...</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  // Find the requested blog post inside the retrieved API list
+  const blog = blogData?.find(
     (item) => item.slug.toLowerCase() === slug?.toLowerCase()
   );
-  console.log(blog.createdAt);  
+  
   if (!blog) {
     notFound();
   }
-  // Safe Date Formatting Function to prevent crash
-  const formatBlogDate = (blogItem) => {
-    const rawDate = blogItem.createdAt || blogItem.date;
+
+  // Safe Date Formatting Function for API timestamps (e.g., ISO strings or createdAt fields)
+  const formatBlogDate = (dateValue) => {
+    if (!dateValue) return "Date unavailable";
     try {
-      const parsedDate = new Date(rawDate);
-      // Check if the parsed date is actually valid
+      const parsedDate = new Date(dateValue);
       if (isNaN(parsedDate.getTime())) {
-        return rawDate; 
+        return dateValue; 
       }
       return new Intl.DateTimeFormat("en-US", {
         day: "numeric",
@@ -135,7 +70,7 @@ export default function BlogDetails({ params }) {
         year: "numeric",
       }).format(parsedDate);
     } catch {
-      return rawDate; // Fallback directly to the raw string if it fails
+      return dateValue;
     }
   };
   
@@ -185,7 +120,8 @@ export default function BlogDetails({ params }) {
 
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-sm">
                 <FaCalendarAlt className="text-cyan-400" />
-                {formatBlogDate(blog)}
+                {/* Safe live formatting of database field */}
+                {formatBlogDate(blog.createdAt)}
               </span>
 
               {blog.readTime && (
@@ -225,7 +161,7 @@ export default function BlogDetails({ params }) {
 
                 <div className="space-y-6">
                   {blog.content
-                    .split("\n")
+                    ?.split("\n")
                     .filter((p) => p.trim())
                     .map((paragraph, index) => (
                       <p
@@ -243,7 +179,7 @@ export default function BlogDetails({ params }) {
             <aside className="space-y-6">
               <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-lg text-center border border-slate-100 dark:border-slate-700/50">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-3xl font-black mx-auto shadow-md">
-                  {blog.author.charAt(0)}
+                  {blog.author?.charAt(0)}
                 </div>
 
                 <h3 className="mt-4 text-xl font-bold dark:text-white">
