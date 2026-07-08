@@ -10,6 +10,7 @@ import {
   Users,
   LogOut,
   FolderKanban,
+  SquarePen,
   Briefcase,
   ChevronDown,
   Circle
@@ -75,6 +76,14 @@ export default function Sidebar({
       hasSubmenu : true,
       subItems: [
         {name: 'All Clients', link: "/dashboard/clients"}
+      ]
+    },
+    { 
+      name: "Blogs",       
+      icon: SquarePen ,
+      hasSubmenu : true,
+      subItems: [
+        {name: 'All Blogs', link: "/dashboard/blogs"}
       ]
     },
   ];

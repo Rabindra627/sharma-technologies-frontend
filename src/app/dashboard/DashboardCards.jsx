@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Briefcase, FolderKanban, Mail, Users, TrendingUp } from "lucide-react";
+import { Briefcase, FolderKanban, Mail, Users, TrendingUp, SquarePen } from "lucide-react";
 
 export default function DashboardCards() {
 
@@ -10,6 +10,7 @@ export default function DashboardCards() {
     totalEnquiries: 0,
     totalProjects: 0,
     totalClients: 0,
+    totalBlogs: 0
   });
 
   useEffect(() => {
@@ -55,6 +56,13 @@ export default function DashboardCards() {
       growth: "+22%",
       icon: Briefcase,
       color: "from-emerald-500 to-green-600",
+    },
+    {
+      title: "Blogs",
+      count: stats.totalBlogs,
+      growth: "+22%",
+      icon: SquarePen,
+      color: "from-amber-500 to-green-600",
     },
   ];
 

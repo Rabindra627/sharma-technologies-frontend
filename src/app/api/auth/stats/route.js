@@ -3,15 +3,18 @@
 import User from "@/models/User";
 import Contact from "@/models/Contact";
 import Project from "@/models/Project";
+import Blog from "@/models/Blog";
 
 export async function GET() {
   const totalUsers = await User.countDocuments();
   const totalEnquiries = await Contact.countDocuments();
   const totalProjects = await Project.countDocuments();
+  const totalBlogs = await Blog.countDocuments();
 
   return Response.json({
     totalUsers,
     totalEnquiries,
-    totalProjects
+    totalProjects,
+    totalBlogs
   });
 }

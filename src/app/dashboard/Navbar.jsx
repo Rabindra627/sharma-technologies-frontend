@@ -119,7 +119,7 @@ useEffect(() => {
         </div>
 
         {/* Center Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-xl mx-10">
+        {/* <div className="hidden md:flex flex-1 max-w-xl mx-10">
           <div className="relative w-full">
             <Search
               size={18}
@@ -147,7 +147,7 @@ useEffect(() => {
               "
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Right Side Utility Actions */}
         <div className="flex items-center gap-4">
