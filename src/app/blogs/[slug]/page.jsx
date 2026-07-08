@@ -94,11 +94,7 @@ export default function BlogDetails({ params }) {
   const resolvedParams = use(params);
   const slug = resolvedParams?.slug;
 
-  const dateObject = new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",  // "short" -> Apr, "long" -> April
-    year: "numeric",
-  });
+  
 
   useEffect(() => {      
     async function fetchBlogs() {
@@ -107,7 +103,8 @@ export default function BlogDetails({ params }) {
         const result = await response.json();
         
         if (result.success && result.data && result.data.length > 0) {
-          setBlogData(result.data);          
+          setBlogData(result.data);   
+               
         }
       } catch (err) {
         console.error("API Fetch failed, using static fallback data:", err.message);
@@ -119,11 +116,29 @@ export default function BlogDetails({ params }) {
   const blog = blogData.find(
     (item) => item.slug.toLowerCase() === slug?.toLowerCase()
   );
-
+  console.log(blog.createdAt);  
   if (!blog) {
     notFound();
   }
-
+  // Safe Date Formatting Function to prevent crash
+  const formatBlogDate = (blogItem) => {
+    const rawDate = blogItem.createdAt || blogItem.date;
+    try {
+      const parsedDate = new Date(rawDate);
+      // Check if the parsed date is actually valid
+      if (isNaN(parsedDate.getTime())) {
+        return rawDate; 
+      }
+      return new Intl.DateTimeFormat("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(parsedDate);
+    } catch {
+      return rawDate; // Fallback directly to the raw string if it fails
+    }
+  };
+  
   return (
     <>
       <Navbar />
@@ -170,7 +185,7 @@ export default function BlogDetails({ params }) {
 
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-sm">
                 <FaCalendarAlt className="text-cyan-400" />
-                {dateObject.format(new Date(blog.createdAt))}
+                {formatBlogDate(blog)}
               </span>
 
               {blog.readTime && (
