@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FaUser, FaCalendarAlt, FaClock, FaArrowLeft } from "react-icons/fa";
+import { useState, useEffect, use } from "react";
 
 const blogs = [
   {
@@ -11,7 +14,7 @@ const blogs = [
     description:
       "How IoT sensors and AI are transforming modern building management systems.",
     image: "/images/IoT-smart.png",
-    date: "Apr 6, 2026",
+    date: "July 7, 2026",
     author: "Rabindra Sharma",
     category: "IoT",
     readTime: "5 min read",
@@ -38,7 +41,7 @@ edge computing, and cloud-based analytics platforms.
     description:
       "Discover how artificial intelligence is revolutionizing patient care.",
     image: "/images/health-care.png",
-    date: "Apr 5, 2026",
+    date: "May 5, 2026",
     author: "Dr. John Doe",
     category: "AI",
     readTime: "6 min read",
@@ -61,7 +64,7 @@ to enhance operational efficiency.
     description:
       "Using sensors and machine learning for intelligent traffic management.",
     image: "/images/smart-traffic.png",
-    date: "Apr 4, 2026",
+    date: "June 4, 2026",
     author: "UrbanTech",
     category: "Smart City",
     readTime: "5 min read",
@@ -84,11 +87,31 @@ Smart traffic systems leverage advanced multi-sensor nodes alongside predictive 
   },
 ];
 
-export default async function BlogDetails({ params }) {
-  const { slug } = await params;
+export default function BlogDetails({ params }) {
+  const [blogData, setBlogData] = useState(blogs);
+  
+  // Safely unwrap params using React.use() to match modern Next.js patterns
+  const resolvedParams = use(params);
+  const slug = resolvedParams?.slug;
 
-  const blog = blogs.find(
-    (item) => item.slug.toLowerCase() === slug.toLowerCase(),
+  useEffect(() => {      
+    async function fetchBlogs() {
+      try {        
+        const response = await fetch("/api/blogs"); 
+        const result = await response.json();
+        
+        if (result.success && result.data && result.data.length > 0) {
+          setBlogData(result.data);          
+        }
+      } catch (err) {
+        console.error("API Fetch failed, using static fallback data:", err.message);
+      }                 
+    }
+    fetchBlogs();
+  }, []);
+
+  const blog = blogData.find(
+    (item) => item.slug.toLowerCase() === slug?.toLowerCase()
   );
 
   if (!blog) {
@@ -105,22 +128,22 @@ export default async function BlogDetails({ params }) {
           {/* Subtle Grid Pattern Overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(#fff_1px,transparent_1px)] opacity-10 [background-size:16px_16px] pointer-events-none" />
 
-          {/* TOP TO MIDDLE SMOOTH BLEND (Guarantees Navbar Links Visibility) */}
+          {/* TOP TO MIDDLE SMOOTH BLEND */}
           <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-10" />
 
           {/* MIDDLE TO BOTTOM SMOOTH DEEP BLEND */}
           <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none z-10" />
-          {/* Top Navigation Back Action */}
          
-          {/* Hero Content Metadata Area (Perfectly Centered and Clear) */}
-          <div className="relative max-w-4xl mx-auto  flex flex-col items-start justify-start text-start z-20 px-4">
+          {/* Hero Content Metadata Area */}
+          <div className="relative max-w-4xl mx-auto flex flex-col items-start justify-start text-start z-20 px-4">
             <Link
-                href="/#blog"
-                className="inline-flex py-6  gap-2 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition group"
-              >
-                <FaArrowLeft className="transform group-hover:-translate-x-1 transition duration-200" />
-                Back to Blogs
-              </Link>
+              href="/#blog"
+              className="inline-flex py-6 gap-2 text-sm font-semibold text-slate-300 hover:text-cyan-400 transition group"
+            >
+              <FaArrowLeft className="transform group-hover:-translate-x-1 transition duration-200" />
+              Back to Blogs
+            </Link>
+            
             <span className="bg-cyan-500 text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold tracking-wider uppercase shadow-md mb-6">
               {blog.category}
             </span>
@@ -133,7 +156,7 @@ export default async function BlogDetails({ params }) {
               {blog.description}
             </p>
 
-            <div className="flex flex-wrap justify-center gap-4 mt-8 text-xs md:text-sm text-slate-200 font-medium">
+            <div className="flex flex-wrap gap-4 mt-8 text-xs md:text-sm text-slate-200 font-medium">
               <span className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-sm">
                 <FaUser className="text-cyan-400" />
                 {blog.author}
@@ -172,7 +195,7 @@ export default async function BlogDetails({ params }) {
         {/* Content Layout Area */}
         <section className="max-w-7xl mx-auto px-4 md:px-6 py-12">
           <div className="grid lg:grid-cols-3 gap-10">
-            {/* Dynamic Markdown/Text Article Output */}
+            
             <article className="lg:col-span-2">
               <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 dark:border-slate-700/50">
                 <h2 className="text-2xl font-black mb-6 dark:text-white border-b border-slate-100 dark:border-slate-700 pb-4">
@@ -195,9 +218,8 @@ export default async function BlogDetails({ params }) {
               </div>
             </article>
 
-            {/* Context Sidebar Elements */}
+            {/* Sidebar Elements */}
             <aside className="space-y-6">
-              {/* Author Profile */}
               <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-lg text-center border border-slate-100 dark:border-slate-700/50">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-3xl font-black mx-auto shadow-md">
                   {blog.author.charAt(0)}
@@ -212,7 +234,6 @@ export default async function BlogDetails({ params }) {
                 </p>
               </div>
 
-              {/* Tech Tags */}
               <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-lg border border-slate-100 dark:border-slate-700/50">
                 <h3 className="font-bold text-lg mb-4 dark:text-white">
                   Technologies
@@ -232,15 +253,13 @@ export default async function BlogDetails({ params }) {
                 </div>
               </div>
 
-              {/* Newsletter Container */}
               <div className="bg-gradient-to-br from-cyan-600 to-blue-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-10 -translate-y-10 pointer-events-none" />
 
                 <h3 className="text-xl font-bold">Stay Updated</h3>
 
                 <p className="mt-3 text-sm text-cyan-50/90 leading-relaxed">
-                  Subscribe to receive the latest technology articles and
-                  insights.
+                  Subscribe to receive the latest technology articles and insights.
                 </p>
 
                 <button className="mt-6 w-full sm:w-fit bg-white text-cyan-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-cyan-50 transition active:scale-95">

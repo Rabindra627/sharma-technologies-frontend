@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { FaCalendarAlt, FaUser } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
-// Ensure all slugs are strictly lowercase to prevent routing lookup mismatches
+
 const blogs = [
   {
     title: "Smart IoT Buildings",
@@ -15,7 +16,24 @@ const blogs = [
     date: "Apr 6, 2026",
     author: "Rabindra Sharma",
     category: "IoT",
-    slug: "smart-iot-buildings", // Changed 'IoT' to 'iot'
+    readTime: "5 min read",
+    slug: "smart-iot-buildings",
+    content: `
+Smart buildings use IoT sensors, automation, and cloud technologies
+to optimize energy efficiency, security, and operational performance.
+
+Modern facilities integrate connected devices that continuously monitor
+temperature, humidity, occupancy, lighting, and HVAC systems.
+
+These systems generate real-time data which enables predictive
+maintenance and automated decision-making.
+
+Organizations can significantly reduce operating costs while
+improving sustainability and occupant comfort.
+
+The future of smart infrastructure will be powered by AI,
+edge computing, and cloud-based analytics platforms.
+`,
   },
   {
     title: "AI in Healthcare",
@@ -25,7 +43,20 @@ const blogs = [
     date: "Apr 5, 2026",
     author: "Dr. John Doe",
     category: "AI",
+    readTime: "6 min read",
     slug: "ai-in-healthcare",
+    content: `
+Artificial intelligence is transforming healthcare by enabling
+faster diagnosis and personalized treatment.
+
+Machine learning algorithms help doctors analyze medical images,
+predict diseases, and improve patient outcomes.
+
+AI-powered systems also assist in drug discovery and clinical research.
+
+Hospitals are increasingly adopting intelligent healthcare solutions
+to enhance operational efficiency.
+`,
   },
   {
     title: "Smart Traffic Systems",
@@ -35,7 +66,11 @@ const blogs = [
     date: "Apr 4, 2026",
     author: "UrbanTech",
     category: "Smart City",
+    readTime: "5 min read",
     slug: "smart-traffic-systems",
+    content: `
+Smart traffic systems leverage advanced multi-sensor nodes alongside predictive cloud algorithms to reduce intersection wait-times, detect road incidents instantly, and dynamically route emergency services safely through dense urban districts.
+`,
   },
   {
     title: "Web Development",
@@ -45,11 +80,53 @@ const blogs = [
     date: "June 4, 2026",
     author: "Anand Sharma",
     category: "Development",
+    readTime: "4 min read",
     slug: "web-development",
+    content: `Web development is the process of building and maintaining websites and web applications. It includes everything from creating simple static pages to complex systems like e-commerce platforms, social networks, and enterprise solutions. In today’s digital world, having a strong online presence is essential for businesses and individuals alike. A well-designed website not only attracts users but also builds trust and drives growth.`,
   },
 ];
 
 export default function BlogsSection() {
+  // 1. Pass your mock static 'blogs' array as the default initial state
+  const [blogData, setBlogData] = useState(blogs);
+  const [loading, setLoading] = useState(true);
+  const dateObject = new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",  // "short" -> Apr, "long" -> April
+    year: "numeric",
+  });
+  
+  useEffect(() => {    
+    async function fetchBlogs() {
+      try {
+        const response = await fetch("/api/blogs"); 
+        const result = await response.json();
+        
+        if (result.success && result.data && result.data.length > 0) {
+          // If API succeeds, overwrite with live database content
+          setBlogData(result.data);
+          
+        }
+      } catch (err) {
+        console.error("API Fetch failed, using static fallback data:", err.message);
+        // No need to set an error state here; blogData already contains your default `blogs` array
+      } finally {
+        setLoading(false);
+      }      
+      
+     
+    }
+
+    fetchBlogs();
+    
+  }, []);  
+  // 2. Remove the rigid error check so the component never crashes or shows an error screen
+  if (loading) return <p className="p-8 text-center text-slate-600 dark:text-slate-400">Loading blogs...</p>;
+  if (!blogData || blogData.length === 0) return <p className="p-8 text-center text-slate-500">No articles found.</p>;
+
+  const featuredBlog = blogData[0];
+  
+  
   return (
     <section
       id="blog"
@@ -80,14 +157,15 @@ export default function BlogsSection() {
           viewport={{ once: true }}
           className="relative overflow-hidden rounded-3xl mb-12"
         >
-          <Link href={`/blogs/${blogs[0].slug}`}>
+          <Link href={`/blogs/${featuredBlog.slug}`}>
             <div className="grid lg:grid-cols-2 bg-white dark:bg-slate-800 shadow-xl cursor-pointer">
 
               <div className="relative h-[300px] lg:h-[500px]">
                 <Image
-                  src={blogs[0].image}
-                  alt={blogs[0].title}
+                  src={featuredBlog.image}
+                  alt={featuredBlog.title}                  
                   fill
+                  priority
                   className="object-cover"
                 />
               </div>
@@ -97,23 +175,23 @@ export default function BlogsSection() {
                   Featured Post
                 </span>
 
-                <h3 className="mt-6 text-3xl md:text-5xl font-bold dark:text-white">
-                  {blogs[0].title}
+                <h3 className="mt-6 text-3xl md:text-5xl font-bold dark:text-white text-slate-900">
+                  {featuredBlog.title}
                 </h3>
 
                 <p className="mt-5 text-lg text-slate-600 dark:text-slate-300">
-                  {blogs[0].description}
+                  {featuredBlog.description}
                 </p>
 
                 <div className="flex flex-wrap gap-5 mt-6 text-sm text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-2">
                     <FaUser />
-                    {blogs[0].author}
+                    {featuredBlog.author}
                   </span>
 
                   <span className="flex items-center gap-2">
                     <FaCalendarAlt />
-                    {blogs[0].date}
+                    {dateObject.format(new Date(featuredBlog.createdAt))}
                   </span>
                 </div>
 
@@ -128,7 +206,7 @@ export default function BlogsSection() {
         {/* Blog Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-          {blogs.slice(1).map((blog, index) => (
+          {blogData.slice(1).map((blog, index) => (
             <motion.div
               key={blog.slug}
               initial={{ opacity: 0, y: 25 }}
@@ -157,11 +235,11 @@ export default function BlogsSection() {
                     <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
                       <span className="flex items-center gap-1">
                         <FaCalendarAlt />
-                        {blog.date}
+                        {dateObject.format(new Date(blog.createdAt))}
                       </span>
                     </div>
 
-                    <h3 className="text-xl font-bold dark:text-white group-hover:text-cyan-600 transition">
+                    <h3 className="text-xl font-bold dark:text-white text-slate-900 group-hover:text-cyan-600 transition">
                       {blog.title}
                     </h3>
 
