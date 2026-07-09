@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb"; 
-import Blog from "@/models/Blog";  
+import {connectDB} from "@/lib/mongodb"; // Direct function to connect to MongoDB
+import Blog from "@/models/Blog";  // Path to your schema file
 import path from "path";
 import fs from "fs/promises";
-import { getCloudinary } from "next-cloudinary"; 
 
-// Constants & Production Guardrails
-const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB (Safely under Vercel Free Tier 4.5MB payload limit)
-const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-// POST: Create a Blog Post (Supports Hybrid Environment Logic)
 export async function POST(request) {
   try {
     await connectDB();
 
-    // 1. Parse incoming Form Data
+    // 1. Parse incoming Form Data instead of JSON
     const formData = await request.formData();
     
     const title = formData.get("title");
@@ -24,9 +18,9 @@ export async function POST(request) {
     const readTime = formData.get("readTime");
     const slug = formData.get("slug");
     const content = formData.get("content");
-    const imageFile = formData.get("image"); 
+    const imageFile = formData.get("image"); // This grabs the actual File object
 
-    // 2. Comprehensive Field Validation
+    // 2. Validation
     if (!title || !description || !imageFile || !author || !category || !readTime || !slug || !content) {
       return NextResponse.json(
         { success: false, message: "All fields are required." },
@@ -34,22 +28,7 @@ export async function POST(request) {
       );
     }
 
-    // 3. Security & Resource Guardrails (File Size & Format Checking)
-    if (!ALLOWED_FILE_TYPES.includes(imageFile.type)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid file type. Only JPG, PNG, and WebP are allowed." },
-        { status: 400 }
-      );
-    }
-
-    if (imageFile.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { success: false, message: "File size exceeds the 4MB serverless threshold limit." },
-        { status: 400 }
-      );
-    }
-
-    // 4. Duplicate Entry Safeguard
+    // 3. Duplicate Check
     const normalizedSlug = slug.toLowerCase().trim();
     const existingBlog = await Blog.findOne({ slug: normalizedSlug });
     if (existingBlog) {
@@ -59,49 +38,30 @@ export async function POST(request) {
       );
     }
 
-    // 5. ArrayBuffer Conversion for Streaming Channels
-    const arrayBuffer = await imageFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // 4. Process and Save Image File Local to Directory
+    const buffer = Buffer.from(await imageFile.arrayBuffer());
     
-    let imageUrlPath = "";
+    // Create a unique filename to prevent overwriting files with identical names
+    const filename = `${Date.now()}-${imageFile.name.replaceAll(" ", "_")}`;
+    
+    // Define your local upload path (saves to public/uploads/)
+    const uploadDir = path.join(process.cwd(), "public/images/blogs");
+    const filePath = path.join(uploadDir, filename);
 
-    // 6. Dynamic Environment Splitтер (Vercel vs Local Machine)
-    if (process.env.NODE_ENV === "production") {
-      // PRODUCTION (Vercel Node Engine): Pipes stream into next-cloudinary
-      const cloudinaryInstance = getCloudinary();
+    // Ensure the destination directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    
+    // Write the file buffer to the folder
+    await fs.writeFile(filePath, buffer);
 
-      const cloudinaryResponse = await new Promise((resolve, reject) => {
-        cloudinaryInstance.uploader.upload_stream(
-          { 
-            folder: "blogs", 
-            resource_type: "image" 
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        ).end(buffer);
-      });
+    // This is the public URL path that will be saved in your DB
+    const imageUrlPath = `/images/blogs/${filename}`;
 
-      imageUrlPath = cloudinaryResponse.secure_url;
-    } else {
-      // DEVELOPMENT (Local Server): Saves inside your local public directory path
-      const filename = `${Date.now()}-${imageFile.name.replaceAll(" ", "_")}`;
-      const uploadDir = path.join(process.cwd(), "public/images/blogs");
-      const filePath = path.join(uploadDir, filename);
-
-      // Ensure directory pathway tree exists locally
-      await fs.mkdir(uploadDir, { recursive: true });
-      await fs.writeFile(filePath, buffer);
-      
-      imageUrlPath = `/images/blogs/${filename}`;
-    }
-
-    // 7. Instantiate and Save document inside MongoDB
+    // 5. Save to database
     const newBlog = await Blog.create({
       title,
       description,
-      image: imageUrlPath, 
+      image: imageUrlPath, // Storing the local file path string
       author,
       category,
       readTime,
@@ -115,7 +75,6 @@ export async function POST(request) {
     );
 
   } catch (error) {
-    console.error("Critical execution breakdown:", error);
     return NextResponse.json(
       { success: false, message: "Server Error", error: error.message },
       { status: 500 }
@@ -123,32 +82,30 @@ export async function POST(request) {
   }
 }
 
-// GET: Fetch and Paginate all Blog entries
+// GET : getAll blogs
 export async function GET(request) {
   try {
     await connectDB();
 
-    // 1. URL Parameter Parsing
+    // 1. Extract query params from URL
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.max(1, parseInt(searchParams.get("limit") || "10", 10));
+    const page = searchParams.get("page") || "1";
+    const limit = searchParams.get("limit") || "10";
     const category = searchParams.get("category");
 
-    // 2. Query Assembly
+    // 2. Build the query filter
     const filter = {};
     if (category) {
       filter.category = { $regex: new RegExp(category, "i") };
     }
 
-    // 3. Parallel DB Operations (Optimizes network blocking speeds)
-    const [blogs, totalBlogs] = await Promise.all([
-      Blog.find(filter)
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .lean(), // Converts heavy Mongoose objects to light POJOs
-      Blog.countDocuments(filter)
-    ]);
+    // 3. Fetch data
+    const blogs = await Blog.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit));
+
+    const totalBlogs = await Blog.countDocuments(filter);
 
     return NextResponse.json(
       {
@@ -156,8 +113,8 @@ export async function GET(request) {
         count: blogs.length,
         pagination: {
           totalBlogs,
-          currentPage: page,
-          totalPages: Math.ceil(totalBlogs / limit),
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalBlogs / parseInt(limit)),
         },
         data: blogs,
       },
