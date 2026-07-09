@@ -160,13 +160,12 @@ export default function BlogsSection() {
           <Link href={`/blogs/${featuredBlog.slug}`}>
             <div className="grid lg:grid-cols-2 bg-white dark:bg-slate-800 shadow-xl cursor-pointer">
 
-              <div className="relative h-[300px] lg:h-[500px]">
+              <div className="relative h-[200px] lg:h-[300px]">
                 <Image
                   src={featuredBlog.image}
-                  alt={featuredBlog.title}                  
-                  fill
-                  priority
-                  className="object-cover"
+                  alt={featuredBlog.title}                                    
+                  fill                  
+                  className="w-full h-64 object-cover rounded-lg"
                 />
               </div>
 
