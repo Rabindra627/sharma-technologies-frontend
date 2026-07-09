@@ -124,6 +124,7 @@ export async function GET(request) {
         data: blogs,
       },
       { status: 200 }
+      
     );
   } catch (error) {
     return NextResponse.json(

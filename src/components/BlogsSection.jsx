@@ -167,6 +167,7 @@ export default function BlogsSection() {
                   fill                  
                   className="w-full h-64 object-cover rounded-lg"
                 />
+                
               </div>
 
               <div className="p-8 md:p-12 flex flex-col justify-center">
