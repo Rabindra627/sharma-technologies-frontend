@@ -4,9 +4,11 @@ import Blog from "@/models/Blog";
 import path from "path";
 import fs from "fs/promises";
 import cloudinary from "@/lib/cloudinary";
+import { Readable } from "stream"; // Needed to turn buffer into a readable stream for Cloudinary
 
 export const runtime = "nodejs";
 
+// --- POST HANDLER (Create Blog Post) ---
 export async function POST(request) {
   try {
     await connectDB();
@@ -47,23 +49,21 @@ export async function POST(request) {
     const buffer = Buffer.from(arrayBuffer);
     
     if (process.env.NODE_ENV === "production") {
-      // --- PRODUCTION ENVIRONMENT: Upload via Stream (Cloudinary v2 compatible) ---
+      // --- PRODUCTION ENVIRONMENT: Upload via Stream ---
       imageUrlPath = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder: "image/blogs", // Cloudinary v2 does not accept a leading slash (/)
-            resource_type: "auto",  // Ensures standard image buffers map correctly
+            folder: "blogs", 
+            resource_type: "auto",  
           },
           (error, result) => {
-            if (error) {
-              return reject(error);
-            }
+            if (error) return reject(error);
             resolve(result.secure_url);
           }
         );
         
-        // Correctly pipe/end the buffer directly to the stream
-        uploadStream.end(buffer);
+        // Convert buffer to stream and pipe it to Cloudinary
+        Readable.from(buffer).pipe(uploadStream);
       });
 
     } else {
@@ -96,7 +96,6 @@ export async function POST(request) {
     );
 
   } catch (error) {
-    // Modified to grab the exact native error message structure Cloudinary throws
     return NextResponse.json(
       { 
         success: false, 
@@ -108,13 +107,15 @@ export async function POST(request) {
   }
 }
 
-// GET handler
+// --- GET HANDLER (Fetch Blog Posts) ---
 export async function GET(request) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
-    const page = searchParams.get("page") || "1";
-    const limit = searchParams.get("limit") || "10";
+    
+    // Ensure base numbers are evaluated correctly
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.max(1, parseInt(searchParams.get("limit") || "10", 10));
     const category = searchParams.get("category");
 
     const filter = {};
@@ -122,12 +123,14 @@ export async function GET(request) {
       filter.category = { $regex: new RegExp(category, "i") };
     }
 
-    const blogs = await Blog.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(parseInt(limit))
-      .skip((parseInt(page) - 1) * parseInt(limit));
-
-    const totalBlogs = await Blog.countDocuments(filter);
+    // Execute queries in parallel to speed up execution time
+    const [blogs, totalBlogs] = await Promise.all([
+      Blog.find(filter)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Blog.countDocuments(filter)
+    ]);
 
     return NextResponse.json(
       {
@@ -135,8 +138,8 @@ export async function GET(request) {
         count: blogs.length,
         pagination: {
           totalBlogs,
-          currentPage: parseInt(page),
-          totalPages: Math.ceil(totalBlogs / parseInt(limit)),
+          currentPage: page,
+          totalPages: Math.ceil(totalBlogs / limit),
         },
         data: blogs,
       },
