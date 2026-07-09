@@ -3,6 +3,7 @@ import {connectDB} from "@/lib/mongodb"; // Direct function to connect to MongoD
 import Blog from "@/models/Blog";  // Path to your schema file
 import path from "path";
 import fs from "fs/promises";
+// import cloudinary from "@/lib/cloudinary";
 
 export async function POST(request) {
   try {
