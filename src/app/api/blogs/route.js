@@ -5,6 +5,8 @@ import path from "path";
 import fs from "fs/promises";
 import cloudinary from "@/lib/cloudinary";
 
+export const runtime = "nodejs";
+
 export async function POST(request) {
   try {
     await connectDB();
@@ -41,29 +43,39 @@ export async function POST(request) {
 
     // 4. Handle Hybrid Image Upload (Local vs Production)
     let imageUrlPath = "";
-    const buffer = Buffer.from(await imageFile.arrayBuffer());
-
+    const arrayBuffer = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
     if (process.env.NODE_ENV === "production") {
-      // --- PRODUCTION ENVIRONMENT: Upload to Cloudinary ---
-      // Convert buffer to Base64 to stream upload directly to Cloudinary without local disk storage
-      const base64Image = `data:${imageFile.type};base64,${buffer.toString("base64")}`;
-      
-      const uploadResponse = await cloudinary.uploader.upload(base64Image, {
-        folder: "blogs", // Organizes files into a 'blogs' folder inside Cloudinary
+      // --- PRODUCTION ENVIRONMENT: Upload via Stream (Cloudinary v2 compatible) ---
+      imageUrlPath = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "image/blogs", // Cloudinary v2 does not accept a leading slash (/)
+            resource_type: "auto",  // Ensures standard image buffers map correctly
+          },
+          (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result.secure_url);
+          }
+        );
+        
+        // Correctly pipe/end the buffer directly to the stream
+        uploadStream.end(buffer);
       });
 
-      imageUrlPath = uploadResponse.secure_url; // Use Cloudinary HTTPS URL
     } else {
       // --- DEVELOPMENT ENVIRONMENT: Save Locally ---
       const filename = `${Date.now()}-${imageFile.name.replaceAll(" ", "_")}`;
       const uploadDir = path.join(process.cwd(), "public/images/blogs");
       const filePath = path.join(uploadDir, filename);
 
-      // Ensure directory exists and write file
       await fs.mkdir(uploadDir, { recursive: true });
       await fs.writeFile(filePath, buffer);
 
-      imageUrlPath = `/images/blogs/${filename}`; // Relative public path
+      imageUrlPath = `/images/blogs/${filename}`;
     }
 
     // 5. Save to database
@@ -84,14 +96,19 @@ export async function POST(request) {
     );
 
   } catch (error) {
+    // Modified to grab the exact native error message structure Cloudinary throws
     return NextResponse.json(
-      { success: false, message: "Server Error", error: error.message },
+      { 
+        success: false, 
+        message: "Server Error", 
+        error: error.message || (error.error ? error.error.message : String(error)) 
+      },
       { status: 500 }
     );
   }
 }
 
-// GET handler remains unchanged...
+// GET handler
 export async function GET(request) {
   try {
     await connectDB();
@@ -124,7 +141,6 @@ export async function GET(request) {
         data: blogs,
       },
       { status: 200 }
-
     );
   } catch (error) {
     return NextResponse.json(
