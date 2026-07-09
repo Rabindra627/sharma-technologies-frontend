@@ -8,7 +8,7 @@ import cloudinary from "@/lib/cloudinary";
 export async function POST(request) {
   try {
     await connectDB();
-
+    
     // 1. Parse incoming Form Data
     const formData = await request.formData();
     
