@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb"; 
-import Blog from "@/models/Blog";  
+import { connectDB } from "@/lib/mongodb";
+import Blog from "@/models/Blog";
 import path from "path";
 import fs from "fs/promises";
 import { v2 as cloudinary } from "cloudinary";
@@ -27,31 +27,55 @@ export async function POST(request) {
     const readTime = formData.get("readTime");
     const slug = formData.get("slug");
     const content = formData.get("content");
-    const imageFile = formData.get("image"); 
+    const imageFile = formData.get("image");
 
     // Validation
-    if (!title || !description || !imageFile || !author || !category || !readTime || !slug || !content) {
-      return NextResponse.json({ success: false, message: "All fields are required." }, { status: 400 });
+    if (
+      !title ||
+      !description ||
+      !imageFile ||
+      !author ||
+      !category ||
+      !readTime ||
+      !slug ||
+      !content
+    ) {
+      return NextResponse.json(
+        { success: false, message: "All fields are required." },
+        { status: 400 },
+      );
     }
 
     if (!ALLOWED_FILE_TYPES.includes(imageFile.type)) {
-      return NextResponse.json({ success: false, message: "Invalid file type. Only JPG, PNG, and WebP allowed." }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid file type. Only JPG, PNG, and WebP allowed.",
+        },
+        { status: 400 },
+      );
     }
 
     if (imageFile.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ success: false, message: "File size exceeds the 4MB limit." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "File size exceeds the 4MB limit." },
+        { status: 400 },
+      );
     }
 
     const normalizedSlug = slug.toLowerCase().trim();
     const existingBlog = await Blog.findOne({ slug: normalizedSlug });
     if (existingBlog) {
-      return NextResponse.json({ success: false, message: "A blog with this slug already exists." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "A blog with this slug already exists." },
+        { status: 400 },
+      );
     }
 
     // Process File Buffer
     const arrayBuffer = await imageFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
+
     let imageUrlPath = "";
 
     // Check environment context
@@ -60,13 +84,15 @@ export async function POST(request) {
     if (isProduction) {
       // PRODUCTION RUNTIME: Upload directly to your Cloudinary storage
       const cloudinaryResponse = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: "blogs", resource_type: "image" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        ).end(buffer);
+        cloudinary.uploader
+          .upload_stream(
+            { folder: "blogs", resource_type: "image" },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            },
+          )
+          .end(buffer);
       });
       imageUrlPath = cloudinaryResponse.secure_url;
     } else {
@@ -77,7 +103,7 @@ export async function POST(request) {
 
       await fs.mkdir(uploadDir, { recursive: true });
       await fs.writeFile(filePath, buffer);
-      
+
       imageUrlPath = `/images/blogs/${filename}`;
     }
 
@@ -85,19 +111,28 @@ export async function POST(request) {
     const newBlog = await Blog.create({
       title,
       description,
-      image: imageUrlPath, 
+      image: imageUrlPath,
       author,
       category,
       readTime,
       slug: normalizedSlug,
-      content
+      content,
     });
 
-    return NextResponse.json({ success: true, message: "Blog post created successfully!", data: newBlog }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Blog post created successfully!",
+        data: newBlog,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Upload handler failed:", error);
-    return NextResponse.json({ success: false, message: "Server Error", error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Server Error", error: error.message },
+      { status: 500 },
+    );
   }
 }
 
@@ -116,17 +151,31 @@ export async function GET(request) {
     }
 
     const [blogs, totalBlogs] = await Promise.all([
-      Blog.find(filter).sort({ createdAt: -1 }).limit(limit).skip((page - 1) * limit).lean(),
-      Blog.countDocuments(filter)
+      Blog.find(filter)
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .lean(),
+      Blog.countDocuments(filter),
     ]);
 
-    return NextResponse.json({
-      success: true,
-      count: blogs.length,
-      pagination: { totalBlogs, currentPage: page, totalPages: Math.ceil(totalBlogs / limit) },
-      data: blogs,
-    }, { status: 200 });
+    return NextResponse.json(
+      {
+        success: true,
+        count: blogs.length,
+        pagination: {
+          totalBlogs,
+          currentPage: page,
+          totalPages: Math.ceil(totalBlogs / limit),
+        },
+        data: blogs,
+      },
+      { status: 200 },
+    );
   } catch (error) {
-    return NextResponse.json({ success: false, message: "Server Error", error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Server Error", error: error.message },
+      { status: 500 },
+    );
   }
 }
