@@ -35,7 +35,7 @@ export default function BlogsPage() {
     category: "",
     readTime: "",
     slug: "",
-    content: "default text",
+    content: "",
   });
 
   // Simulated Fluid Refresh Action
