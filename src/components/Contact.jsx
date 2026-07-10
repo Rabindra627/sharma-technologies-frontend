@@ -137,8 +137,8 @@ export default function Contact() {
                   </div>
                   <div className="text-sm">
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Email Address</p>
-                    <a href="mailto:info@sharmatechnologies.com" className="font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                      info@sharmatechnologies.com
+                    <a href="mailto:support@sharmatechnologies.com" className="font-semibold text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                      support@sharmatechnologies.com
                     </a>
                   </div>
                 </div>
