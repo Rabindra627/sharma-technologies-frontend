@@ -6,22 +6,17 @@ export async function POST(req) {
   try {
     const { name, email, message } = await req.json();
 
+    // 1. Establish database connection early
     await connectDB();
 
-    const contact = await Contact.create({
-      name,
-      email,
-      message,
-    });
-
-    // Updated transporter configuration for Titan Mail (BigRock)
+    // 2. Set up the email transporter
     const transporter = nodemailer.createTransport({
       host: "smtp.titan.email",
       port: 465,
-      secure: true, // true for 465, false for other ports
+      secure: true, // true for 465
       auth: {
-        user: process.env.EMAIL_USER, // e.g., info@sharmatechnologies.com
-        pass: process.env.EMAIL_PASS, // Your Titan account password or app password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
@@ -64,31 +59,39 @@ export async function POST(req) {
       </html>
     `;
 
+    // 3. Attempt to send the email first
     await transporter.sendMail({
-      from: `"Sharma Technologies Inquiry" <${process.env.EMAIL_USER}>`, // Recommended format
+      from: `"Sharma Technologies Inquiry" <${process.env.EMAIL_USER}>`,
       replyTo: email,
       to: process.env.EMAIL_TO,
       subject: `New Inquiry Initiative by ${name}`,
       html: htmlContent,
     });
 
+    // 4. Save to Database ONLY if the email above succeeds without throwing an error
+    const contact = await Contact.create({
+      name,
+      email,
+      message,
+    });
+
     return Response.json(
       {
         success: true,
         data: contact,
-        message: "Message sent successfully",
+        message: "Message sent and saved successfully",
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Error processing inquiry:", error);
 
     return Response.json(
       {
         success: false,
-        message: error.message,
+        message: error.message || "Failed to process request",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
