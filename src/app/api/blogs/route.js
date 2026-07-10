@@ -3,8 +3,6 @@ import { connectDB } from "@/lib/mongodb";
 import Blog from "@/models/Blog";  
 import path from "path";
 import fs from "fs/promises";
-import cloudinary from "@/lib/cloudinary";
-import { Readable } from "stream"; // Needed to turn buffer into a readable stream for Cloudinary
 
 export const runtime = "nodejs";
 
@@ -43,40 +41,19 @@ export async function POST(request) {
       );
     }
 
-    // 4. Handle Hybrid Image Upload (Local vs Production)
-    let imageUrlPath = "";
+    // 4. Handle Image Upload (Local Disk Storage)
     const arrayBuffer = await imageFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    if (process.env.NODE_ENV === "production") {
-      // --- PRODUCTION ENVIRONMENT: Upload via Stream ---
-      imageUrlPath = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder: "blogs", 
-            resource_type: "auto",  
-          },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result.secure_url);
-          }
-        );
-        
-        // Convert buffer to stream and pipe it to Cloudinary
-        Readable.from(buffer).pipe(uploadStream);
-      });
+    const filename = `${Date.now()}-${imageFile.name.replaceAll(" ", "_")}`;
+    const uploadDir = path.join(process.cwd(), "public/images/blogs");
+    const filePath = path.join(uploadDir, filename);
 
-    } else {
-      // --- DEVELOPMENT ENVIRONMENT: Save Locally ---
-      const filename = `${Date.now()}-${imageFile.name.replaceAll(" ", "_")}`;
-      const uploadDir = path.join(process.cwd(), "public/images/blogs");
-      const filePath = path.join(uploadDir, filename);
+    // Ensure directory exists and write file
+    await fs.mkdir(uploadDir, { recursive: true });
+    await fs.writeFile(filePath, buffer);
 
-      await fs.mkdir(uploadDir, { recursive: true });
-      await fs.writeFile(filePath, buffer);
-
-      imageUrlPath = `/images/blogs/${filename}`;
-    }
+    const imageUrlPath = `/images/blogs/${filename}`;
 
     // 5. Save to database
     const newBlog = await Blog.create({
@@ -100,7 +77,7 @@ export async function POST(request) {
       { 
         success: false, 
         message: "Server Error", 
-        error: error.message || (error.error ? error.error.message : String(error)) 
+        error: error.message || String(error) 
       },
       { status: 500 }
     );
