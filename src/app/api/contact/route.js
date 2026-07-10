@@ -14,16 +14,18 @@ export async function POST(req) {
       message,
     });
 
+    // Updated transporter configuration for Titan Mail (BigRock)
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.titan.email",
+      port: 465,
+      secure: true, // true for 465, false for other ports
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.EMAIL_USER, // e.g., info@sharmatechnologies.com
+        pass: process.env.EMAIL_PASS, // Your Titan account password or app password
       },
     });
 
-    // Html mail content
-
+    // HTML mail content
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -63,11 +65,11 @@ export async function POST(req) {
     `;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Sharma Technologies Inquiry" <${process.env.EMAIL_USER}>`, // Recommended format
       replyTo: email,
       to: process.env.EMAIL_TO,
       subject: `New Inquiry Initiative by ${name}`,
-      html:htmlContent
+      html: htmlContent,
     });
 
     return Response.json(
@@ -76,7 +78,7 @@ export async function POST(req) {
         data: contact,
         message: "Message sent successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error(error);
@@ -86,7 +88,7 @@ export async function POST(req) {
         success: false,
         message: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
