@@ -147,7 +147,7 @@ export default function BlogsSection() {
                 <span className="w-fit px-4 py-2 rounded-full bg-cyan-100 text-cyan-700 text-sm font-semibold">
                   Featured Post
                 </span>
-                <h3 className="mt-6 text-3xl md:text-5xl font-bold dark:text-white text-slate-900">
+                <h3 className="mt-6 text-1xl md:text-1xl font-bold dark:text-white text-slate-900">
                   {featuredBlog.title}
                 </h3>
                 <p className="mt-5 text-lg text-slate-600 dark:text-slate-300">
@@ -202,7 +202,7 @@ export default function BlogsSection() {
                         {formatDate(blog.createdAt || blog.date)}
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold dark:text-white text-slate-900 group-hover:text-cyan-600 transition">
+                    <h3 className="text-sm font-bold dark:text-white text-slate-900 group-hover:text-cyan-600 transition">
                       {blog.title}
                     </h3>
                     <p className="mt-3 text-slate-600 dark:text-slate-400">
