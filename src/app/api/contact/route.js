@@ -72,6 +72,7 @@ export async function POST(req) {
     const contact = await Contact.create({
       name,
       email,
+      subject,
       message,
     });
 

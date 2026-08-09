@@ -9,6 +9,7 @@ export default function Contact() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    subject: "",
     message: "",
   });
 
@@ -26,6 +27,11 @@ export default function Contact() {
       newErrors.email = "Email is required";
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(form.email)) {
       newErrors.email = "Invalid email address";
+    }
+    if (!form.subject.trim()) {
+      newErrors.subject = "Subject is required";
+    } else if (form.subject.length < 10) {
+      newErrors.subject = "Message must be at least 10 characters";
     }
 
     if (!form.message.trim()) {
@@ -62,7 +68,7 @@ export default function Contact() {
       const data = await res.json();
       if (res.ok) {
         toast.success(data.message || "Message sent successfully!");
-        setForm({ name: "", email: "", message: "" });
+        setForm({ name: "", email: "", subject: "", message: "" });
       } else {
         toast.error(data.error || "Failed to deliver message.");
       }
@@ -204,6 +210,23 @@ export default function Contact() {
                   }`}
                 />
                 {errors.email && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.email}</p>}
+              </div>
+
+              {/* Subject Field */}
+              <div>
+                <input
+                  type="text"
+                  name="subject"
+                  value={form.subject}
+                  onChange={handleChange}
+                  placeholder="Your Email"
+                  className={`w-full px-4 sm:px-5 py-3 rounded-2xl border bg-slate-50 dark:bg-slate-900/40 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 transition-all ${
+                    errors.subject
+                      ? "border-red-500 focus:ring-red-500/20"
+                      : "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+                {errors.subject && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.subject}</p>}
               </div>
 
               {/* Message Payload Area */}
