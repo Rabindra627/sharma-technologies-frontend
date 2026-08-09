@@ -57,10 +57,10 @@ export default function Footer() {
             {/* Social Connection Badges */}
             <div className="flex items-center gap-3 pt-2">
               {[
-                { Icon: FaFacebookF, label: "Facebook link", url: "#" },
-                { Icon: FaLinkedinIn, label: "LinkedIn link", url: "#" },
-                { Icon: FaGithub, label: "GitHub link", url: "#" },
-                { Icon: FaTwitter, label: "Twitter link", url: "#" },
+                { Icon: FaFacebookF, label: "Facebook link", url: "https://www.facebook.com/profile.php?id=100006317468529" },
+                { Icon: FaLinkedinIn, label: "LinkedIn link", url: "https://www.linkedin.com/in/rabindra-sharma-3b46a7189/" },
+                { Icon: FaGithub, label: "GitHub link", url: "https://github.com/RabindraSharma" },
+                { Icon: FaTwitter, label: "Twitter link", url: "https://x.com/Rabindra4890851" },
               ].map(({ Icon, label, url }, index) => (
                 <a
                   key={index}
