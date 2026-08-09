@@ -90,7 +90,7 @@ export default function Services() {
                   {service.icon}
                 </motion.div>
 
-                <h3 className="relative z-10 text-xl md:text-2xl font-bold text-slate-800 text-center">{service.title}</h3>
+                <h3 className="relative z-10 text-md md:text-1xl font-bold text-slate-800 text-center">{service.title}</h3>
               </motion.div>
             </Link>
           ))}
