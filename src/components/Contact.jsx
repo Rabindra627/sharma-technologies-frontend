@@ -219,7 +219,7 @@ export default function Contact() {
                   name="subject"
                   value={form.subject}
                   onChange={handleChange}
-                  placeholder="Your Email"
+                  placeholder="Subject"
                   className={`w-full px-4 sm:px-5 py-3 rounded-2xl border bg-slate-50 dark:bg-slate-900/40 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 transition-all ${
                     errors.subject
                       ? "border-red-500 focus:ring-red-500/20"
