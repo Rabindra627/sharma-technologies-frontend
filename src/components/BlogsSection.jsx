@@ -150,7 +150,7 @@ export default function BlogsSection() {
                 <h3 className="mt-6 text-1xl md:text-1xl font-bold dark:text-white text-slate-900">
                   {featuredBlog.title}
                 </h3>
-                <p className="mt-5 text-lg text-slate-600 dark:text-slate-300">
+                <p className="mt-5 text-sm text-slate-600 dark:text-slate-300">
                   {featuredBlog.description}
                 </p>
                 <div className="flex flex-wrap gap-5 mt-6 text-sm text-slate-500 dark:text-slate-400">
