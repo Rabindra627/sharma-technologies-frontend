@@ -127,7 +127,7 @@ export default function Contact() {
                   </div>
                   <div className="text-sm">
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Location</p>
-                    <p className="font-semibold text-slate-700 dark:text-slate-300">Janakpur, Nepal</p>
+                    <p className="font-semibold text-slate-700 dark:text-slate-300">Bideha Municipality - 9, Itaharwa, Dhanusha (Nepal)</p>
                   </div>
                 </div>
 
