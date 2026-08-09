@@ -13,21 +13,21 @@ export default function TechTrack() {
     },
     {
       name: "Tailwind CSS (UI & Layout)",
-      percentage: 30,
+      percentage:99.9,
       colorClass: "bg-cyan-500",
       bgLight: "bg-cyan-50",
       textColor: "text-cyan-600"
     },
     {
       name: "TypeScript (Logic & Types)",
-      percentage: 15,
+      percentage:99,
       colorClass: "bg-blue-600",
       bgLight: "bg-blue-50",
       textColor: "text-blue-600"
     },
     {
       name: "Framer Motion (Animations)",
-      percentage: 10,
+      percentage:35,
       colorClass: "bg-fuchsia-500",
       bgLight: "bg-fuchsia-50",
       textColor: "text-fuchsia-600"
@@ -41,42 +41,42 @@ export default function TechTrack() {
     },
     {
       name: "Generative AI Integration", 
-      percentage: 20,
+      percentage: 50,
       colorClass: "bg-amber-500",
       bgLight: "bg-amber-50",
       textColor: "text-amber-600"
     },
     {
       name: "Spring Boot", 
-      percentage: 20,
+      percentage:70,
       colorClass: "bg-cyan-500",
       bgLight: "bg-cyan-50",
       textColor: "text-cyan-600"
     },
     {
       name: "Hibernate", 
-      percentage: 30,
+      percentage: 99,
       colorClass: "bg-cyan-500",
       bgLight: "bg-cyan-50",
       textColor: "text-cyan-600"
     },
     {
       name: "SQL Server", 
-      percentage: 75,
+      percentage:100,
       colorClass: "bg-orange-500",
       bgLight: "bg-orange-50",
       textColor: "text-orange-600"
     },
     {
       name: "ORACLE", 
-      percentage: 55,
+      percentage: 99.9,
       colorClass: "bg-fuchsia-500",
       bgLight: "bg-fuchsia-50",
       textColor: "text-fuchsia-600"
     },
     {
       name: "Node.js", 
-      percentage: 60,
+      percentage: 89.99,
       colorClass: "bg-emerald-500",
       bgLight: "bg-emerald-50",
       textColor: "text-emerald-600"
