@@ -109,8 +109,8 @@ export default function EnquiriesPage() {
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Enquiry Influx</h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Triage incoming enterprise requests, evaluate priority tickets, and route leads.</p>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Enquiry Inbox</h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">evaluate priority tickets, and manage enquiries.</p>
           </div>
 
           <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
@@ -200,7 +200,7 @@ export default function EnquiriesPage() {
                           {enq.priority || 'HIGH'}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-slate-400 dark:text-slate-500 whitespace-nowrap">{enq.createdAt}</td>
+                      <td className="py-4 px-6 text-slate-400 dark:text-slate-500 whitespace-nowrap">{enq.createdAt ? new Date(enq.createdAt).toLocaleDateString() : "Just Now"}</td>
                       <td className="py-4 px-6 text-right">
                         <button 
                           onClick={(e) => handleArchive(enq.id, e)}
