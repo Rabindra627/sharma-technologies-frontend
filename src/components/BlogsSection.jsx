@@ -85,33 +85,41 @@ export default function BlogsSection() {
     return dateObject.format(new Date(timestamp));
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     async function fetchBlogs() {
       try {
-        const response = await fetch("/api/blogs"); 
+        const response = await fetch("/api/blogs");
         const result = await response.json();
-        
+
         if (result.success && result.data && result.data.length > 0) {
           setBlogData(result.data);
         }
       } catch (err) {
-        console.error("API Fetch failed, using static fallback data:", err.message);
+        console.error(
+          "API Fetch failed, using static fallback data:",
+          err.message,
+        );
       } finally {
         setLoading(false);
-      }      
+      }
     }
     fetchBlogs();
-  }, []);  
+  }, []);
 
-  if (loading) return <p className="p-8 text-center text-slate-600 dark:text-slate-400">Loading blogs...</p>;
-  if (!blogData || blogData.length === 0) return <p className="p-8 text-center text-slate-500">No articles found.</p>;
+  if (loading)
+    return (
+      <p className="p-8 text-center text-slate-600 dark:text-slate-400">
+        Loading blogs...
+      </p>
+    );
+  if (!blogData || blogData.length === 0)
+    return <p className="p-8 text-center text-slate-500">No articles found.</p>;
 
   const featuredBlog = blogData[0];
-  
+
   return (
     <section id="blog" className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="inline-block px-4 py-2 rounded-full bg-cyan-100 text-cyan-700 font-medium text-sm">
@@ -121,7 +129,8 @@ export default function BlogsSection() {
             Insights & Technology Blogs
           </h2>
           <p className="mt-5 text-lg text-slate-600 dark:text-slate-400">
-            Explore the latest trends in software development, AI, cloud computing, IoT, and digital transformation.
+            Explore the latest trends in software development, AI, cloud
+            computing, IoT, and digital transformation.
           </p>
         </div>
 
@@ -134,12 +143,13 @@ export default function BlogsSection() {
         >
           <Link href={`/blogs/${featuredBlog.slug}`}>
             <div className="grid lg:grid-cols-2 bg-white dark:bg-slate-800 shadow-xl cursor-pointer">
-              <div className="relative h-[200px] lg:h-[300px]">
+              <div className="relative h-[200px] lg:h-[300px] relative w-max h-max max-w-full">
                 <Image
                   src={featuredBlog.image}
-                  alt={featuredBlog.title}                                    
-                  fill                  
-                  className="w-full h-64 object-cover rounded-lg"
+                  alt={featuredBlog.title}
+                  width={800}
+                  height={400}
+                  className="w-full h-auto object-cover rounded-lg object-contain rounded-lg !static"
                 />
               </div>
 
@@ -231,7 +241,6 @@ export default function BlogsSection() {
             </button>
           </Link>
         </div>
-
       </div>
     </section>
   );
