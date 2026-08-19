@@ -6,7 +6,7 @@ export default function TechTrack() {
   const techStats = [
     {
       name: "Next.js",
-      percentage: 45,
+      percentage: 100,
       colorClass: "bg-slate-900",
       bgLight: "bg-slate-100",
       textColor: "text-slate-900"
