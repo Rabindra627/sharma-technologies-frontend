@@ -182,7 +182,7 @@ export default function BlogsSection() {
         </motion.div>
 
         {/* Blog Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-3 lg:grid-cols-3 gap-6">
           {blogData.slice(1).map((blog, index) => (
             <motion.div
               key={blog.slug}
@@ -198,7 +198,7 @@ export default function BlogsSection() {
                       src={blog.image}
                       alt={blog.title}
                       fill
-                      className="object-cover group-hover:scale-110 transition duration-700 object-contain rounded-lg !static"
+                      className="object-cover group-hover:scale-110 transition duration-700  rounded-lg !static"
                     />
                     <span className="absolute top-4 left-4 bg-cyan-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                       {blog.category}
