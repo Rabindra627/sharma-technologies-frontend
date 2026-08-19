@@ -75,12 +75,11 @@ export default function BlogsSection() {
     year: "numeric",
   });
 
-  // Helper helper function to parse dates safely without throwing exceptions
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const timestamp = Date.parse(dateString);
     if (isNaN(timestamp)) {
-      return dateString; // Return original text fallback if parsing fails (e.g. "Apr 6, 2026")
+      return dateString;
     }
     return dateObject.format(new Date(timestamp));
   };
@@ -97,7 +96,7 @@ export default function BlogsSection() {
       } catch (err) {
         console.error(
           "API Fetch failed, using static fallback data:",
-          err.message,
+          err.message
         );
       } finally {
         setLoading(false);
@@ -118,17 +117,18 @@ export default function BlogsSection() {
   const featuredBlog = blogData[0];
 
   return (
-    <section id="blog" className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900">
+    <section id="blog" className="py-12 sm:py-16 md:py-24 bg-slate-50 dark:bg-slate-900 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="inline-block px-4 py-2 rounded-full bg-cyan-100 text-cyan-700 font-medium text-sm">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 lg:mb-16">
+          <span className="inline-block px-4 py-1.5 sm:py-2 rounded-full bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 font-medium text-xs sm:text-sm">
             Latest Articles
           </span>
-          <h2 className="mt-5 text-4xl md:text-5xl font-black text-slate-900 dark:text-white">
+          <h2 className="mt-4 sm:mt-5 text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
             Insights & Technology Blogs
           </h2>
-          <p className="mt-5 text-lg text-slate-600 dark:text-slate-400">
+          <p className="mt-3 sm:mt-5 text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-400">
             Explore the latest trends in software development, AI, cloud
             computing, IoT, and digital transformation.
           </p>
@@ -136,93 +136,109 @@ export default function BlogsSection() {
 
         {/* Featured Blog */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative overflow-hidden rounded-3xl mb-12"
+          transition={{ duration: 0.5 }}
+          className="relative overflow-hidden rounded-2xl sm:rounded-3xl mb-8 sm:mb-12 shadow-lg hover:shadow-xl transition-shadow"
         >
           <Link href={`/blogs/${featuredBlog.slug}`}>
-            <div className="grid lg:grid-cols-2 bg-white dark:bg-slate-800 shadow-xl cursor-pointer">
-              <div className="relative h-[200px] lg:h-[300px] relative w-max h-max max-w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 bg-white dark:bg-slate-800 cursor-pointer">
+              
+              {/* Featured Image Container */}
+              <div className="relative h-56 sm:h-72 md:h-80 lg:h-full min-h-[240px] sm:min-h-[300px] w-full overflow-hidden">
                 <Image
                   src={featuredBlog.image}
                   alt={featuredBlog.title}
-                  width={800}
-                  height={400}
-                  className="w-full h-auto object-cover rounded-lg object-contain rounded-lg !static"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover object-center transition-transform duration-500 hover:scale-105"
+                  priority
                 />
               </div>
 
-              <div className="p-8 md:p-12 flex flex-col justify-center">
-                <span className="w-fit px-4 py-2 rounded-full bg-cyan-100 text-cyan-700 text-sm font-semibold">
-                  Featured Post
-                </span>
-                <h3 className="mt-6 text-1xl md:text-1xl font-bold dark:text-white text-slate-900">
+              {/* Featured Content */}
+              <div className="p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center">
+                <div>
+                  <span className="inline-block px-3.5 py-1.5 rounded-full bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 text-xs sm:text-sm font-semibold">
+                    Featured Post
+                  </span>
+                </div>
+                <h3 className="mt-4 sm:mt-6 text-xl sm:text-2xl md:text-3xl font-bold dark:text-white text-slate-900 leading-snug">
                   {featuredBlog.title}
                 </h3>
-                <p className="mt-5 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-300 line-clamp-3">
                   {featuredBlog.description}
                 </p>
-                <div className="flex flex-wrap gap-5 mt-6 text-sm text-slate-500 dark:text-slate-400">
+                <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-6 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-2">
-                    <FaUser />
+                    <FaUser className="text-cyan-600 dark:text-cyan-400" />
                     {featuredBlog.author}
                   </span>
                   <span className="flex items-center gap-2">
-                    <FaCalendarAlt />
+                    <FaCalendarAlt className="text-cyan-600 dark:text-cyan-400" />
                     {formatDate(featuredBlog.createdAt || featuredBlog.date)}
                   </span>
                 </div>
-                <button className="mt-8 w-fit px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-semibold transition">
-                  Read Article →
-                </button>
+                <div className="mt-6 sm:mt-8">
+                  <span className="inline-flex items-center justify-center px-5 py-2.5 sm:px-6 sm:py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition-colors">
+                    Read Article →
+                  </span>
+                </div>
               </div>
             </div>
           </Link>
         </motion.div>
 
         {/* Blog Grid */}
-        <div className="grid sm:grid-cols-3 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {blogData.slice(1).map((blog, index) => (
             <motion.div
               key={blog.slug}
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.15 }}
+              transition={{ delay: index * 0.1, duration: 0.4 }}
               viewport={{ once: true }}
+              className="h-full"
             >
-              <Link href={`/blogs/${blog.slug}`}>
-                <div className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full cursor-pointer">
-                  <div className="relative h-60 overflow-hidden relative w-max h-max max-w-full">
+              <Link href={`/blogs/${blog.slug}`} className="block h-full">
+                <div className="group bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col h-full cursor-pointer border border-slate-100 dark:border-slate-800">
+                  
+                  {/* Grid Image Container */}
+                  <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100 dark:bg-slate-700">
                     <Image
                       src={blog.image}
                       alt={blog.title}
                       fill
-                      className="object-cover group-hover:scale-110 transition duration-700  rounded-lg !static"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <span className="absolute top-4 left-4 bg-cyan-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    <span className="absolute top-3 sm:top-4 left-3 sm:left-4 bg-cyan-600 text-white text-[10px] sm:text-xs font-semibold px-2.5 py-1 rounded-full shadow-md">
                       {blog.category}
                     </span>
                   </div>
 
-                  <div className="p-6">
-                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
-                      <span className="flex items-center gap-1">
-                        <FaCalendarAlt />
-                        {formatDate(blog.createdAt || blog.date)}
-                      </span>
+                  {/* Card Body */}
+                  <div className="p-5 sm:p-6 flex flex-col flex-grow justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-2.5">
+                        <FaCalendarAlt className="text-cyan-600 dark:text-cyan-400" />
+                        <span>{formatDate(blog.createdAt || blog.date)}</span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-bold dark:text-white text-slate-900 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      <p className="mt-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 line-clamp-3">
+                        {blog.description}
+                      </p>
                     </div>
-                    <h3 className="text-sm font-bold dark:text-white text-slate-900 group-hover:text-cyan-600 transition">
-                      {blog.title}
-                    </h3>
-                    <p className="mt-3 text-slate-600 dark:text-slate-400">
-                      {blog.description}
-                    </p>
-                    <div className="flex justify-between items-center mt-6">
-                      <span className="text-sm text-slate-500">
+
+                    {/* Card Footer */}
+                    <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100 dark:border-slate-700/50 text-xs sm:text-sm">
+                      <span className="text-slate-500 dark:text-slate-400 font-medium truncate max-w-[50%]">
                         {blog.author}
                       </span>
-                      <span className="text-cyan-600 font-semibold">
+                      <span className="text-cyan-600 dark:text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform">
                         Read More →
                       </span>
                     </div>
@@ -234,13 +250,14 @@ export default function BlogsSection() {
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-12 sm:mt-16">
           <Link href="/blogs">
-            <button className="px-8 py-4 rounded-2xl bg-slate-900 dark:bg-white dark:text-slate-900 text-white font-semibold hover:scale-105 transition">
+            <button className="px-6 py-3.5 sm:px-8 sm:py-4 rounded-xl sm:rounded-2xl bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs sm:text-sm font-semibold hover:scale-105 transition-transform active:scale-95 shadow-md">
               View All Articles
             </button>
           </Link>
         </div>
+
       </div>
     </section>
   );
