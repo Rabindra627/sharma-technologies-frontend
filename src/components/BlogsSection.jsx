@@ -193,12 +193,12 @@ export default function BlogsSection() {
             >
               <Link href={`/blogs/${blog.slug}`}>
                 <div className="group bg-white dark:bg-slate-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 h-full cursor-pointer">
-                  <div className="relative h-60 overflow-hidden">
+                  <div className="relative h-60 overflow-hidden relative w-max h-max max-w-full">
                     <Image
                       src={blog.image}
                       alt={blog.title}
                       fill
-                      className="object-cover group-hover:scale-110 transition duration-700"
+                      className="object-cover group-hover:scale-110 transition duration-700 object-contain rounded-lg !static"
                     />
                     <span className="absolute top-4 left-4 bg-cyan-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                       {blog.category}
