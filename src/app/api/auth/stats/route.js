@@ -2,7 +2,7 @@
 
 import User from "@/models/User";
 import Contact from "@/models/Contact";
-import Project from "@/models/Project";
+import Project from "@/models/Project-old";
 import Blog from "@/models/Blog";
 import Client from "@/models/Client";
 

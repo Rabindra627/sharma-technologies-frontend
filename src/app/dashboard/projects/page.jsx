@@ -111,6 +111,7 @@ export default function ProjectsTablePage() {
           // Map the MongoDB data format to your table's state format
           const mappedProjects = result.data.map((project) => ({
             id: project._id,
+            projectId : project.projectId,
             name: project.projectName,
             category: project.category,
             status: project.initialStatus,
@@ -137,10 +138,10 @@ export default function ProjectsTablePage() {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "Active": return "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200/50";
-      case "In Progress": return "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200/50";
-      case "Review": return "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200/50";
-      case "Completed": return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200";
+      case "ACTIVE": return "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200/50";
+      case "IN PROGRESS": return "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200/50";
+      case "REVIEW": return "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border-blue-200/50";
+      case "COMPLETED": return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200";
       default: return "bg-slate-50 text-slate-600";
     }
   };
@@ -212,8 +213,8 @@ export default function ProjectsTablePage() {
                   ))
                 ) : (
                   projects.map((project) => (
-                    <tr key={project.id} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors duration-200">
-                      <td className="py-4 px-6 font-mono text-xs font-semibold text-slate-400 dark:text-slate-500">{project.id}</td>
+                    <tr key={project.projectId} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors duration-200">
+                      <td className="py-4 px-6 font-mono text-xs font-semibold text-slate-400 dark:text-slate-500">{project.projectId}</td>
                       <td className="py-4 px-6">
                         <span className="font-semibold block text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{project.name}</span>
                         <span className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 inline-block">{project.category}</span>
@@ -271,7 +272,7 @@ export default function ProjectsTablePage() {
                     </span>
                   </div>
                   <span className="font-mono text-xs font-semibold text-slate-400 dark:text-slate-500 shrink-0">
-                    {project.id}
+                    {project.projectId}
                   </span>
                 </div>
 
@@ -364,10 +365,12 @@ export default function ProjectsTablePage() {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white dark:bg-slate-950 text-sm focus:outline-none focus:border-blue-500 dark:border-slate-800"
                   >
-                    <option value="In Progress">In Progress</option>
-                    <option value="Active">Active</option>
-                    <option value="Review">Review</option>
-                    <option value="Completed">Completed</option>
+                    <option value="IN PROGRESS">In Progress</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="REVIEW">Review</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="ON_HOLD">On Hold</option>
+                    <option value="CANCELLED">Cancelled</option>
                   </select>
                 </div>
               </div>
