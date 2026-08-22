@@ -59,6 +59,7 @@ ProjectSchema.pre("validate", async function (next) {
       const paddedSequence = String(counter.seq).padStart(4, "0");
       this.projectId = `PRJ-${paddedSequence}`;
       console.log(this.projectId);      
+      
     } catch (error) {
       next(error);
     }
