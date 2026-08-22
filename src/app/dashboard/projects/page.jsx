@@ -81,6 +81,7 @@ export default function ProjectsTablePage() {
       // 2. Map the MongoDB response data safely back into your client state format
       const createdProject = {
         id: result.data._id, // Uses the real MongoDB Object ID
+        projectId: result.data.projectId,
         name: result.data.projectName,
         category: result.data.category,
         status: result.data.initialStatus,
