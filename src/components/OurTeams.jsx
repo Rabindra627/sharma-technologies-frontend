@@ -29,7 +29,7 @@ const teamMembers = [
   {
     name: "Anand Sharma",
     role: "Frontend Developer",
-    image: "/images/profile/default-user.png",
+    image: "/images/team/anand-2.jpeg",
     description:
       "A UI/UX Designer sits at the intersection of user psychology and beautiful design. They are responsible for understanding user needs, crafting seamless user journeys, and creating high-fidelity, polished visual layouts that make digital products intuitive and enjoyable to use.",
     linkedin: "#",
