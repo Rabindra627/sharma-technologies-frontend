@@ -307,7 +307,6 @@ export default function BlogsSection() {
             </motion.button>
           </Link>
         </div>
-
       </div>
     </section>
   );
