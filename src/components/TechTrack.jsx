@@ -152,7 +152,7 @@ export default function TechTrack() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 mt-5"
+            className="text-3xl sm:text-3xl font-black tracking-tight text-slate-900 mt-5"
           >
             Our Core <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent">Tech Stacks</span>
           </motion.h2>
