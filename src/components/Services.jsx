@@ -1,6 +1,6 @@
 "use client";
 
-import { FaCode, FaMobileAlt, FaCloud, FaRobot, FaCheck, FaGift } from "react-icons/fa";
+import { FaCode, FaMobileAlt, FaCloud, FaRobot, FaCheck, FaGift,FaClock } from "react-icons/fa";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -12,6 +12,7 @@ const services = [
     originalPrice: "$5,000",
     discountPrice: "$2,999",
     billingCycle: "one-time",
+    duration : "2-3 week",
     badge: "Most Popular",
     exclusiveOffer: "Free 1-Year Premium Hosting & Domain",
     features: [
@@ -35,6 +36,7 @@ const services = [
     originalPrice: "$50,000",
     discountPrice: "$29,999",
     billingCycle: "starting at",
+    duration : "6-8 week",
     badge: "Best Value MVP",
     exclusiveOffer: "Free iOS & Android Cross-Platform Build",
     features: [
@@ -58,6 +60,7 @@ const services = [
     originalPrice: "$800",
     discountPrice: "$399",
     billingCycle: "/month",
+    duration : "0-1 week",
     badge: "Cost Saver",
     exclusiveOffer: "$500 AWS/Azure Credits On Sign-up",
     features: [
@@ -81,6 +84,7 @@ const services = [
     originalPrice: "$25,000",
     discountPrice: "$12,499",
     billingCycle: "starting at",
+    duration : "4-6 week",
     badge: "Exclusive Launch",
     exclusiveOffer: "Free Custom Fine-Tuning & Prompt Audit",
     features: [
@@ -164,10 +168,13 @@ export default function Services() {
                 <div className="my-6">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-extrabold text-slate-900">{service.discountPrice}</span>
-                    <span className="text-xs text-slate-500 font-medium">{service.billingCycle}</span>
+                    <span className="text-xs text-slate-500 font-medium">{service.billingCycle}</span>                   
                   </div>
                   <div className="text-xs text-slate-400 line-through mt-1">
                     Standard: {service.originalPrice}
+                  </div>
+                  <div className="text-xs text-2xl text:md-2xl text-slate-400 mt-1 flex items-baseline gap-2">
+                  <FaClock  className=" items-baseline gap-1.5 mt-2"/> Duration: {service.duration}
                   </div>
                 </div>
 
