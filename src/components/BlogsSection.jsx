@@ -143,7 +143,7 @@ export default function BlogsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold text-slate-900 mt-6 tracking-tight"
+            className="text-3xl md:text-3xl font-extrabold text-blue-400 mt-6 tracking-tight"
           >
             Latest Technical Blogs
           </motion.h2>
