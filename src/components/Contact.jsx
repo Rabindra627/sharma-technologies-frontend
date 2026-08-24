@@ -119,7 +119,7 @@ export default function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white"
+            className="text-3xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white"
           >
             Start Your Next Project With{" "}
             <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 dark:from-blue-400 dark:via-cyan-400 dark:to-indigo-300 bg-clip-text text-transparent">
