@@ -39,11 +39,11 @@ const teamMembers = [
     facebook: "#",
   },
   {
-    name: "Bikash Lama",
-    role: "Backend Developer",
-    image: "/images/profile/default-user.png",
+    name: "Shiv Shankar Thakur",
+    role: "Marketing Field Officer",
+    image: "/images/team/Shiv.jpeg",
     description:
-      "Engineers foundational server-side logic and cloud infrastructure. Ensures data pipelines, API integrations, and database workloads run securely and at scale.",
+      "A Marketing Field Officer operates on the ground to drive product visibility, expand retail distribution, collect market intelligence, and support local sales teams. While a Field Marketing Manager handles strategic events and pipeline generation (often in B2B/Tech), a Marketing Field Officer focuses on direct physical outreach, store execution, and territory activation frequently.",
     linkedin: "#",
     github: "#",
     twitter: "#",

@@ -11,7 +11,7 @@ export async function POST(req) {
 
     // 2. Set up the email transporter
     const transporter = nodemailer.createTransport({
-      host: "smtp.titan.email",
+      host: "mail.sharmatechnologies.com",
       port: 465,
       secure: true, // true for 465
       auth: {
