@@ -40,10 +40,10 @@ const teamMembers = [
   },
   {
     name: "Shiv Shankar Thakur",
-    role: "Marketing Field Officer",
+    role: "Field Sales Executive",
     image: "/images/team/Shiv.jpeg",
     description:
-      "A Marketing Field Officer operates on the ground to drive product visibility, expand retail distribution, collect market intelligence, and support local sales teams. While a Field Marketing Manager handles strategic events and pipeline generation (often in B2B/Tech), a Marketing Field Officer focuses on direct physical outreach, store execution, and territory activation frequently.",
+      "A Field Sales Executive (FSE) is a front-line revenue generator responsible for closing sales through direct, face-to-face interactions with prospects and clients in a specific geographic territory. Unlike inside sales reps who work via phone or email, field sales executives travel directly to prospective clients, retail locations, corporate offices, or consumer homes to build relationships, deliver pitches, and secure contracts.",
     linkedin: "#",
     github: "#",
     twitter: "#",
