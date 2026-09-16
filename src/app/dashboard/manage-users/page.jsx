@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import Image  from "next/image";
 // Initial mock data for users
 const INITIAL_USERS = [
-  { id: "USR-9021", name: "Olivia Vance", email: "olivia@company.com", role: "Admin", status: "Active", joined: "Jan 12, 2026", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" },
-  { id: "USR-4412", name: "Marcus Chen", email: "marcus.c@company.com", role: "Editor", status: "Active", joined: "Feb 28, 2026", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" },
-  { id: "USR-7832", name: "Elena Rostova", email: "elena.r@company.com", role: "Viewer", status: "Suspended", joined: "Mar 05, 2026", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" },
-  { id: "USR-1099", name: "David Kross", email: "d.kross@company.com", role: "Developer", status: "Active", joined: "May 19, 2026", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" },
+  { id: "USR-9021", name: "Olivia Vance", email: "olivia@company.com", role: "Admin", active: true, joined: "Jan 12, 2026", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150" },
+  { id: "USR-4412", name: "Marcus Chen", email: "marcus.c@company.com", role: "Editor", active: true, joined: "Feb 28, 2026", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" },
+  { id: "USR-7832", name: "Elena Rostova", email: "elena.r@company.com", role: "Viewer", active: false, joined: "Mar 05, 2026", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" },
+  { id: "USR-1099", name: "David Kross", email: "d.kross@company.com", role: "Developer", active: true, joined: "May 19, 2026", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" },
 ];
 
 export default function ManageUsersPage() {
@@ -21,7 +21,7 @@ export default function ManageUsersPage() {
     name: "",
     email: "",
     role: "Viewer",
-    status: "Active"
+    active: true
   });
 
   // Simulated Smooth Refresh Actions
