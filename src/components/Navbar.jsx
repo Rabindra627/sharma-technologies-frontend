@@ -92,9 +92,7 @@ export default function Navbar() {
           if (data.user?.token) {
             localStorage.setItem("user", JSON.stringify(data.user));
           }
-
           setUser(data.user);
-
           if (data.user?.role === "ADMIN") {
             router.push("/dashboard");
           } else {
