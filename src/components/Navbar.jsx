@@ -99,6 +99,7 @@ export default function Navbar() {
             router.push("/dashboard");
           } else {
             router.push("/");
+            toast.info("Please log in to access your account");
           }
         } else {
           toast.success(data.message || "Account created successfully");
