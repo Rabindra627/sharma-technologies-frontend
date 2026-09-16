@@ -96,8 +96,7 @@ export default function Navbar() {
           if (data.user?.role === "ADMIN") {
             router.push("/dashboard");
           } else {
-            router.push("/");
-            toast.info("Please log in to access your account");
+            router.push("/");            
           }
         } else {
           toast.success(data.message || "Account created successfully");
