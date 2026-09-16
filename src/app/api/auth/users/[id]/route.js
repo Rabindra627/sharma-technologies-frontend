@@ -6,7 +6,7 @@ import { connectDB } from "@/lib/mongodb";
 // PUT: Update an existing user
 export async function PUT(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     console.log("Updating user with ID:", id);
     const body = await req.json();
     const { name, email, password, role, active, avatarUrl } = body;
