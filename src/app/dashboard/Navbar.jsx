@@ -218,7 +218,7 @@ useEffect(() => {
                 </h4>
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-none mt-0.5">
-                  {currentUser.role}
+                  {user?.role || currentUser.role}
                 </p>
               </div>
 
