@@ -48,6 +48,7 @@ export async function POST(request) {
           name: user.name,
           email: user.email,
           role: user.role,
+          token: token,
           avatarUrl: user.avatarUrl,
         },
       },
