@@ -181,9 +181,9 @@ export default function ManageUsersPage() {
                         </span>
                       </td>
                       <td className="py-4 px-6">
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${user.status === "Active" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${user.status === "Active" ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
-                          {user.status || 'ACTIVE'}
+                        <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${user.active === true ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${user.active === true ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+                          {user.active === true ? 'ACTIVE' : 'IN-ACTIVE'}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs">{user.createdAt}</td>
