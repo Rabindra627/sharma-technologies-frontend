@@ -52,7 +52,7 @@ export default function ManageUsersPage() {
       name: formData.name,
       email: formData.email,
       role: formData.role,
-      status: formData.status,
+      active: formData.active,
       joined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       avatar: `https://images.unsplash.com/photo-${1500000000000 + Math.floor(Math.random() * 100000)}?w=150`
     };
