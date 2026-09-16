@@ -1,6 +1,6 @@
 // app/api/dashboard/stats/route.js
 
-import User from "@/models/User-v01";
+import User from "@/models/User";
 import Contact from "@/models/Contact";
 import Project from "@/models/Project";
 import Blog from "@/models/Blog";
