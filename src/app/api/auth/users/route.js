@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "@/models/User";
+import User from "@/models/User-v01";
 import { connectDB } from "@/lib/mongodb";
 import { cookies } from "next/headers";
 

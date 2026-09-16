@@ -9,6 +9,7 @@ const teamMembers = [
     name: "Rabindra Sharma",
     role: "Founder & Full Stack Developer",
     image: "/images/team/founder.png",
+    
     description:
       "As the founder, Rabindra is the visionary and strategic leader of Sharma Technologies. Based out of Janakpur, Nepal, he drives digital innovation and manages the core development team.",
     linkedin: "https://www.linkedin.com/in/rabindra-sharma-3b46a7189",

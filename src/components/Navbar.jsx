@@ -1,17 +1,20 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [user, setUser] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const router = useRouter();
   const [form, setForm] = useState({
@@ -23,15 +26,15 @@ export default function Navbar() {
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
 
-    setErrors({
-      ...errors,
+    setErrors((prev) => ({
+      ...prev,
       [e.target.name]: "",
-    });
+    }));
   };
 
   const validate = () => {
@@ -64,7 +67,7 @@ export default function Navbar() {
       setErrors(validationErrors);
       return;
     }
-    
+
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
       const payload = isLogin
@@ -77,23 +80,30 @@ export default function Navbar() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();      
-      if (res.ok) {          
+      const data = await res.json();
+      if (res.ok) {
         setForm({ name: "", email: "", password: "" });
         setErrors({});
         setModalOpen(false);
-        setMobileMenuOpen(false);        
-        if(isLogin){          
-          toast.success(data.message);
+        setMobileMenuOpen(false);
+
+        if (isLogin) {
+          toast.success(data.message || "Logged in successfully");
           if (data.user?.token) {
             localStorage.setItem("user", JSON.stringify(data.user));
           }
-          setTimeout(() => {
+
+          setUser(data.user);
+
+          if (data.user?.role === "ADMIN") {
             router.push("/dashboard");
-          }, 1500);
-        } else {          
-          toast.success(data.message);          
-        }     
+          } else {
+            router.push("/");
+          }
+        } else {
+          toast.success(data.message || "Account created successfully");
+          setIsLogin(true);
+        }
       } else {
         toast.error(data.error || "Authentication failed");
       }
@@ -123,12 +133,35 @@ export default function Navbar() {
     e.preventDefault();
     const target = document.querySelector(href);
     if (target) {
-      const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - 70;
+      const offsetPosition =
+        target.getBoundingClientRect().top + window.pageYOffset - 70;
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth"
+        behavior: "smooth",
       });
       setMobileMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      localStorage.removeItem("user");
+      setUser(null);
+      setDropdownOpen(false);
+      router.push("/");
+    } catch (err) {
+      toast.error("Logout failed");
     }
   };
 
@@ -138,12 +171,15 @@ export default function Navbar() {
         const res = await fetch("/api/auth/me", { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
-          if (data.authenticated) {
-            router.push("/dashboard");
+          if (data.user) {
+            setUser(data.user);
+            if (data.user.role === "ADMIN") {
+              router.push("/dashboard");
+            }
           }
         }
       } catch (error) {
-        console.log(error);
+        console.error("Auth check failed:", error);
       }
     }
     checkLogin();
@@ -153,14 +189,18 @@ export default function Navbar() {
     <>
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${
-          scrolled 
-            ? "bg-white/95 backdrop-blur-md shadow-md py-2 border-b border-slate-100" 
-            : "bg-transparent py-4"
+          scrolled
+            ? "bg-white/90 backdrop-blur-md shadow-sm py-3 border-b border-slate-100"
+            : "bg-transparent py-5"
         }`}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-8">
           {/* Logo Element */}
-          <Link href="/" onClick={(e) => handleScrollClick(e, "#home")} className="flex items-center">
+          <Link
+            href="/"
+            onClick={(e) => handleScrollClick(e, "#home")}
+            className="flex items-center"
+          >
             <div className="relative w-12 h-12 sm:w-14 sm:h-14 transition-transform duration-300 hover:scale-105">
               <Image
                 src="/images/sharma-tech.png"
@@ -172,7 +212,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Layout links */}
+          {/* Desktop Navigation Links & Action Buttons */}
           <ul className="hidden md:flex items-center space-x-6 lg:space-x-8 font-medium">
             {menuItems.map((item, index) => (
               <li key={index}>
@@ -180,35 +220,92 @@ export default function Navbar() {
                   href={item.href}
                   onClick={(e) => handleScrollClick(e, item.href)}
                   className={`text-sm tracking-wide transition-all duration-300 relative py-2 group ${
-                    scrolled ? "text-slate-600 hover:text-blue-600" : "text-white/90 hover:text-white"
+                    scrolled
+                      ? "text-slate-700 hover:text-blue-600"
+                      : "text-white/90 hover:text-white"
                   }`}
                 >
                   {item.name}
-                  <span className={`absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${
-                    scrolled ? "bg-blue-600" : "bg-white"
-                  }`} />
+                  <span
+                    className={`absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${
+                      scrolled ? "bg-blue-600" : "bg-white"
+                    }`}
+                  />
                 </Link>
               </li>
             ))}
 
             <li>
-              <button
-                onClick={() => {
-                  setModalOpen(true);
-                  setIsLogin(true);
-                }}
-                className={`text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm outline-none active:scale-95 ${
-                  scrolled
-                    ? "bg-slate-900 text-white hover:bg-blue-600 shadow-slate-200"
-                    : "bg-white text-slate-900 border border-transparent hover:bg-transparent hover:border-white hover:text-white"
-                }`}
-              >
-                Login / Signup
-              </button>
+              {!user ? (
+                /* Login / Signup Button (Gray-White theme when scrolled) */
+                <button
+                  onClick={() => {
+                    setModalOpen(true);
+                    setIsLogin(true);
+                  }}
+                  className={`text-sm font-semibold px-5 py-2 rounded-full transition-all duration-300 border outline-none active:scale-95 ${
+                    scrolled
+                      ? "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 hover:text-blue-600"
+                      : "bg-white/20 text-white border-white/30 backdrop-blur-sm hover:bg-white hover:text-slate-800"
+                  }`}
+                >
+                  Login / Signup
+                </button>
+              ) : (
+                /* Logged-In User Button (Matching Gray-White theme when scrolled) */
+                user.role === "USER" && (
+                  <div className="relative" ref={dropdownRef}>
+                    <button
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                      className={`flex items-center space-x-2 text-sm font-medium px-4 py-2 rounded-full transition-all duration-300 outline-none active:scale-95 border ${
+                        scrolled
+                          ? "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 hover:text-blue-600"
+                          : "bg-white/20 text-white border-white/30 backdrop-blur-sm hover:bg-white/30"
+                      }`}
+                    >
+                      <span>Welcome, {user.name || user.email}</span>
+                      <svg
+                        className={`w-3.5 h-3.5 transform transition-transform duration-300 ${
+                          dropdownOpen ? "rotate-180" : "rotate-0"
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+
+                    <AnimatePresence>
+                      {dropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          className="absolute right-0 mt-2 w-44 bg-white text-slate-800 rounded-2xl shadow-xl ring-1 ring-slate-900/5 py-1 z-50 overflow-hidden border border-slate-100"
+                        >
+                          <button
+                            onClick={handleLogout}
+                            className="block w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-red-50 hover:text-red-600 transition-colors"
+                          >
+                            Logout
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              )}
             </li>
           </ul>
 
-          {/* Tablet/Mobile Layout Trigger Controls */}
+          {/* Mobile Drawer Toggle */}
           <button
             aria-label="Toggle navigation menu"
             className="md:hidden flex flex-col items-end justify-center w-8 h-8 space-y-1.5 z-50 rounded-lg outline-none focus:ring-2 focus:ring-blue-500/20 p-1"
@@ -216,28 +313,31 @@ export default function Navbar() {
           >
             <span
               className={`block h-0.5 rounded-full transition-all duration-300 transform origin-right ${
-                mobileMenuOpen ? "w-6 -rotate-45 translate-x-px -translate-y-px" : "w-6"
+                mobileMenuOpen
+                  ? "w-6 -rotate-45 translate-x-px -translate-y-px"
+                  : "w-6"
               } ${scrolled || mobileMenuOpen ? "bg-slate-800" : "bg-white"}`}
             />
             <span
               className={`block h-0.5 rounded-full transition-all duration-300 ${
                 mobileMenuOpen ? "w-0 opacity-0" : "w-4"
-              } ${scrolled ? "bg-slate-800" : "bg-white"}`}
+              } ${scrolled || mobileMenuOpen ? "bg-slate-800" : "bg-white"}`}
             />
             <span
               className={`block h-0.5 rounded-full transition-all duration-300 transform origin-right ${
-                mobileMenuOpen ? "w-6 rotate-45 translate-x-px translate-y-px" : "w-5"
+                mobileMenuOpen
+                  ? "w-6 rotate-45 translate-x-px translate-y-px"
+                  : "w-5"
               } ${scrolled || mobileMenuOpen ? "bg-slate-800" : "bg-white"}`}
             />
           </button>
         </div>
       </nav>
 
-      {/* Slide-out Drawer Panel for Mobile Displays */}
+      {/* Mobile Drawer Panel */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* Backdrop Layer overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -246,17 +346,16 @@ export default function Navbar() {
               className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden"
             />
 
-            {/* Navigation Sheet Drawer content container */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-[280px] bg-white z-40 md:hidden pt-24 px-6 shadow-2xl flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-[280px] bg-white z-40 md:hidden pt-24 px-6 shadow-2xl flex flex-col justify-between pb-8"
             >
               <ul className="flex flex-col space-y-5 text-slate-700 font-medium text-lg">
                 {menuItems.map((item, index) => (
-                  <motion.li 
+                  <motion.li
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
@@ -271,31 +370,45 @@ export default function Navbar() {
                     </Link>
                   </motion.li>
                 ))}
+              </ul>
 
-                <motion.li
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: menuItems.length * 0.05 }}
-                  className="pt-4 border-t border-slate-100"
-                >
+              <div className="pt-4 border-t border-slate-100">
+                {!user ? (
                   <button
                     onClick={() => {
                       setMobileMenuOpen(false);
                       setModalOpen(true);
                       setIsLogin(true);
                     }}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-base text-center py-3 rounded-xl font-semibold shadow-md shadow-blue-100 transition-all active:scale-[0.98]"
+                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-base text-center py-3 rounded-full font-semibold transition-all active:scale-[0.98]"
                   >
                     Login / Signup
                   </button>
-                </motion.li>
-              </ul>
+                ) : (
+                  user.role === "USER" && (
+                    <div className="space-y-3">
+                      <div className="text-sm font-medium text-slate-600 px-1">
+                        Signed in as{" "}
+                        <span className="font-semibold text-slate-900 block truncate">
+                          {user.name || user.email}
+                        </span>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200 text-slate-700 text-sm text-center py-2.5 rounded-full font-semibold transition"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
 
-      {/* Modal Dialog for Authentication flow */}
+      {/* Authentication Modal */}
       <AnimatePresence>
         {modalOpen && (
           <motion.div
@@ -323,7 +436,9 @@ export default function Navbar() {
                   {isLogin ? "Welcome Back" : "Create Account"}
                 </h2>
                 <p className="text-sm mt-2 text-indigo-100/90">
-                  {isLogin ? "Login to continue your session" : "Sign up to start building the future"}
+                  {isLogin
+                    ? "Login to continue your session"
+                    : "Sign up to start building the future"}
                 </p>
               </div>
 
@@ -332,7 +447,10 @@ export default function Navbar() {
                   {!isLogin && (
                     <div>
                       <div className="flex items-center border border-slate-200 focus-within:border-blue-500 rounded-2xl px-4 py-3 bg-slate-50 transition-colors">
-                        <FaUser className="text-slate-400 mr-3 flex-shrink-0" size={14} />
+                        <FaUser
+                          className="text-slate-400 mr-3 flex-shrink-0"
+                          size={14}
+                        />
                         <input
                           type="text"
                           name="name"
@@ -343,14 +461,19 @@ export default function Navbar() {
                         />
                       </div>
                       {errors.name && (
-                        <p className="text-red-500 text-xs mt-1 ml-1">{errors.name}</p>
+                        <p className="text-red-500 text-xs mt-1 ml-1">
+                          {errors.name}
+                        </p>
                       )}
                     </div>
                   )}
 
                   <div>
                     <div className="flex items-center border border-slate-200 focus-within:border-blue-500 rounded-2xl px-4 py-3 bg-slate-50 transition-colors">
-                      <FaEnvelope className="text-slate-400 mr-3 flex-shrink-0" size={14} />
+                      <FaEnvelope
+                        className="text-slate-400 mr-3 flex-shrink-0"
+                        size={14}
+                      />
                       <input
                         type="email"
                         name="email"
@@ -361,13 +484,18 @@ export default function Navbar() {
                       />
                     </div>
                     {errors.email && (
-                      <p className="text-red-500 text-xs mt-1 ml-1">{errors.email}</p>
+                      <p className="text-red-500 text-xs mt-1 ml-1">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
 
                   <div>
                     <div className="flex items-center border border-slate-200 focus-within:border-blue-500 rounded-2xl px-4 py-3 bg-slate-50 transition-colors">
-                      <FaLock className="text-slate-400 mr-3 flex-shrink-0" size={14} />
+                      <FaLock
+                        className="text-slate-400 mr-3 flex-shrink-0"
+                        size={14}
+                      />
                       <input
                         type="password"
                         name="password"
@@ -378,20 +506,24 @@ export default function Navbar() {
                       />
                     </div>
                     {errors.password && (
-                      <p className="text-red-500 text-xs mt-1 ml-1">{errors.password}</p>
+                      <p className="text-red-500 text-xs mt-1 ml-1">
+                        {errors.password}
+                      </p>
                     )}
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 shadow-md shadow-blue-100 hover:shadow-lg active:scale-[0.99] text-sm mt-2"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-semibold transition-all duration-300 shadow-md active:scale-[0.99] text-sm mt-2"
                   >
                     {isLogin ? "Login" : "Create Account"}
                   </button>
                 </form>
 
                 <div className="text-center mt-6 text-sm text-slate-500">
-                  {isLogin ? "Don't have an account?" : "Already have an account?"}
+                  {isLogin
+                    ? "Don't have an account?"
+                    : "Already have an account?"}
                   <button
                     onClick={() => {
                       setIsLogin(!isLogin);
