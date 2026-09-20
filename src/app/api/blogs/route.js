@@ -77,6 +77,8 @@ export async function POST(request) {
       readTime,
       slug: normalizedSlug,
       content,
+      // New blogs are active by default
+      suspended: false,
     });
 
     return NextResponse.json(

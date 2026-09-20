@@ -160,7 +160,9 @@ export default function BlogsSection() {
         </div>
 
         {/* Featured Banner Card */}
-        <motion.div
+        {
+          !featuredBlog.suspended && ( 
+            <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -230,7 +232,9 @@ export default function BlogsSection() {
             </div>
           </Link>
         </motion.div>
-
+          ) 
+        }
+        
         {/* Grid Cards */}
         <motion.div 
           variants={containerVariants}
@@ -240,6 +244,7 @@ export default function BlogsSection() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {blogData.slice(1).map((blog) => (
+            !blog.suspended && (
             <motion.div
               key={blog.slug}
               variants={cardVariants}
@@ -292,8 +297,11 @@ export default function BlogsSection() {
                 </div>
               </Link>
             </motion.div>
-          ))}
+          )
+        ))}
         </motion.div>
+        
+      
 
         {/* Action Button */}
         <div className="text-center mt-16">
@@ -309,5 +317,6 @@ export default function BlogsSection() {
         </div>
       </div>
     </section>
+      
   );
 }

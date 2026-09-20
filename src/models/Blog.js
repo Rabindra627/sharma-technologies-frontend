@@ -34,6 +34,11 @@ const BlogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+     // Blog active/suspended status
+  suspended: {
+    type: Boolean,
+    default: false,
+  },
   },
   {
     timestamps: true,
