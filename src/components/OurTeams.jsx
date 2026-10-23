@@ -17,17 +17,17 @@ const teamMembers = [
     twitter: "#",
     facebook: "https://www.facebook.com/profile.php?id=100006317468529",
   },
-  {
-    name: "Birendra Thakur",
-    role: "Marketing Executive",
-    image: "/images/team/me.png",
-    description:
-      "The strategic and creative engine behind product promotion. Responsible for driving multi-channel growth campaigns and establishing long-term enterprise brand value.",
-    linkedin: "#",
-    github: "#",
-    twitter: "#",
-    facebook: "#",
-  },
+  // {
+  //   name: "Birendra Thakur",
+  //   role: "Marketing Executive",
+  //   image: "/images/team/me.png",
+  //   description:
+  //     "The strategic and creative engine behind product promotion. Responsible for driving multi-channel growth campaigns and establishing long-term enterprise brand value.",
+  //   linkedin: "#",
+  //   github: "#",
+  //   twitter: "#",
+  //   facebook: "#",
+  // },
   {
     name: "Anand Sharma",
     role: "Frontend Developer",

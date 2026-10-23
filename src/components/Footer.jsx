@@ -143,12 +143,12 @@ export default function Footer() {
                   </div>
                   <span className="group-hover:text-cyan-400 transition-colors tracking-wide">(+977) 9705130627</span>
                 </a>
-
-                <a href="tel:+9779824806347" className="flex items-center gap-3 group outline-none">
+                
+                <a href="tel:+9779706676981" className="flex items-center gap-3 group outline-none">
                   <div className="w-8 h-8 rounded-lg bg-slate-800/40 border border-slate-700/30 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-all">
                     <FaPhone size={12} />
                   </div>
-                  <span className="group-hover:text-cyan-400 transition-colors tracking-wide">(+977) 9824806347</span>
+                  <span className="group-hover:text-cyan-400 transition-colors tracking-wide">(+977) 9706676981</span>
                 </a>
               </div>
             </div>
