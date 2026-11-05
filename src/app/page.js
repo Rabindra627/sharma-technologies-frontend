@@ -8,6 +8,7 @@ import BlogsSection from "@/components/BlogsSection";
 import Contact from "@/components/Contact";
 import OurTeamPage from "@/components/OurTeams";
 import TechTrack from "@/components/TechTrack";
+import StatsSection from "@/components/statsSection";
 
 
 export default function Home(){
@@ -21,6 +22,7 @@ return(
 <OurTeamPage/>
 <TechTrack/>
 <BlogsSection/>
+<StatsSection/>
 <Contact/>
 <Footer/>
 </>
