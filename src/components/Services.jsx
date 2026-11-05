@@ -167,10 +167,10 @@ export default function Services() {
                 {/* Price Display */}
                 <div className="my-6">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-3xl font-extrabold text-slate-900">{service.discountPrice}</span>
+                    <span className="text-3sm font-extrabold text-slate-900">{service.discountPrice}</span>
                     <span className="text-xs text-slate-500 font-medium">{service.billingCycle}</span>                   
                   </div>
-                  <div className="text-xs text-slate-400 line-through mt-1">
+                  <div className="text-sm text-slate-400 line-through mt-1">
                     Standard: {service.originalPrice}
                   </div>
                   <div className="text-xs text-2xl text:md-2xl text-slate-400 mt-1 flex items-baseline gap-2">
