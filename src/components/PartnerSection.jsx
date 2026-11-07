@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 
 // Sample partner brand data (replace with your actual partner logos/names)
 const partners = [
-  { id: 1, name: 'CloudScale', logo: '☁️ CloudScale' },
-  { id: 2, name: 'DataCore', logo: '📊 DataCore' },
-  { id: 3, name: 'CyberGuard', logo: '🛡️ CyberGuard' },
+  { id: 1, name: 'Tatsavi, Inc', logo: '☁️ Tatsavi, Inc' },
+  { id: 2, name: 'VeiloScan', logo: '📊 VeiloScan' },
+  { id: 3, name: 'Advika Innovate', logo: '🛡️ Advika Innovate' },
   { id: 4, name: 'QuantumPay', logo: '💳 QuantumPay' },
   { id: 5, name: 'DevOpsify', logo: '⚙️ DevOpsify' },
   { id: 6, name: 'InnoVenture', logo: '💡 InnoVenture' },
@@ -18,10 +18,10 @@ export default function PartnerSection() {
     <section className="py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+          <h2 className="text-3xl md:text-3xl font-extrabold text-blue-500 mt-6 tracking-tight">
             Strategic Partners & Alliances
           </h2>
-          <p className="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
             Collaborating with industry leaders to drive innovation
           </p>
         </div>
