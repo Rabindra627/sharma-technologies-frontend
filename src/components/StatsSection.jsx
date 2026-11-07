@@ -7,21 +7,21 @@ const statsData = [
   {
     id: 1,
     label: 'Successful Projects',
-    value: 250,
+    value: 200,
     suffix: '+',
     description: 'Delivered on time and exceeding expectations.',
   },
   {
     id: 2,
     label: 'Global Clients',
-    value: 120,
+    value: 150,
     suffix: '+',
     description: 'Trusted by startups and Fortune 500 companies.',
   },
   {
     id: 3,
     label: 'Team Experts',
-    value: 35,
+    value: 5,
     suffix: '',
     description: 'Dedicated professionals driven by excellence.',
   },
@@ -41,7 +41,7 @@ export default function StatsSection() {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          <h2 className="text-3xl md:text-3xl font-extrabold text-blue-500 mt-6 tracking-tight">
             Trusted by Businesses Worldwide
           </h2>
           <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
@@ -56,12 +56,13 @@ export default function StatsSection() {
               key={stat.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -8, scale: 1.02 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-gray-700 flex flex-col justify-between hover:border-blue-500/50 transition-colors"
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              className="relative bg-blue-50/70 dark:bg-blue-950/20 p-8 rounded-2xl shadow-xl shadow-blue-500/5 dark:shadow-none border border-blue-100 dark:border-blue-900/40 flex flex-col justify-between hover:border-blue-400 dark:hover:border-blue-600 transition-colors"
             >
               <div>
-                <div className="text-4xl sm:text-5xl font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">
+                <div className="text-3xl sm:text-3xl font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">
                   <CountUp end={stat.value} duration={2.5} enableScrollSpy scrollSpyOnce />
                   {stat.suffix}
                 </div>
@@ -69,7 +70,7 @@ export default function StatsSection() {
                   {stat.label}
                 </h3>
               </div>
-              <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                 {stat.description}
               </p>
             </motion.div>
