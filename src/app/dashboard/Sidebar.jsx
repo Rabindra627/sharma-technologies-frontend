@@ -45,7 +45,7 @@ export default function Sidebar({
       icon: LayoutDashboard 
     },
     { 
-      name: "Users", 
+      name: "User Management", 
       icon: Users,
       hasSubmenu: true,
       subItems: [
@@ -54,7 +54,7 @@ export default function Sidebar({
       ]
     },
     { 
-      name: "Inquiries",       
+      name: "Inquiries Management",       
       icon: Mail,
       hasSubmenu : true,
       subItems : [
@@ -62,7 +62,7 @@ export default function Sidebar({
       ] 
     },
     { 
-      name: "Projects", 
+      name: "Projects Management", 
       icon: FolderKanban,
       hasSubmenu: true,
       subItems: [
@@ -71,7 +71,7 @@ export default function Sidebar({
       ]
     },
     { 
-      name: "Clients",       
+      name: "Clients Management",       
       icon: Briefcase ,
       hasSubmenu : true,
       subItems: [
@@ -79,7 +79,7 @@ export default function Sidebar({
       ]
     },
     { 
-      name: "Blogs",       
+      name: "Blogs Management",       
       icon: SquarePen ,
       hasSubmenu : true,
       subItems: [

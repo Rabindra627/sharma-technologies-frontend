@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 // Updated mock data matching Mongoose schema fields
 const INITIAL_USERS = [
@@ -45,7 +45,16 @@ export default function ManageUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
-  // Form State adapted to Mongoose schema (includes password & active boolean)
+  // DataTable Filter & Pagination States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  // Form State adapted to Mongoose schema
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -61,7 +70,6 @@ export default function ManageUsersPage() {
       setIsLoading(true);
       try {
         const res = await fetch("/api/auth/users");
-        // if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         const rawUsers = data.users || data;
 
@@ -129,7 +137,7 @@ export default function ManageUsersPage() {
     setFormData({
       name: user.name,
       email: user.email,
-      password: "", // Kept blank unless updating
+      password: "",
       avatarUrl: user.avatarUrl || "",
       role: user.role,
       active: user.active,
@@ -137,55 +145,11 @@ export default function ManageUsersPage() {
     setIsModalOpen(true);
   };
 
-  // // Form Submit Handler
-  // const handleFormSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (!formData.name || !formData.email) return;
-  //   if (!editingUser && !formData.password) return; // Password required for new users
-
-  //   if (editingUser) {
-  //     setUsers(
-  //       users.map((u) =>
-  //         u._id === editingUser._id
-  //           ? {
-  //               ...u,
-  //               name: formData.name,
-  //               email: formData.email,
-  //               role: formData.role,
-  //               active: formData.active,
-  //               avatarUrl: formData.avatarUrl || u.avatarUrl
-  //             }
-  //           : u
-  //       )
-  //     );
-  //   } else {
-  //     const newUser = {
-  //       _id: `temp-${Date.now()}`,
-  //       name: formData.name,
-  //       email: formData.email,
-  //       role: formData.role,
-  //       active: formData.active,
-  //       createdAt: new Date().toISOString(),
-  //       avatarUrl: formData.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"
-  //     };
-  //     setUsers([newUser, ...users]);
-  //   }
-
-  //   setIsModalOpen(false);
-  // };
-
-  // // Delete User Handler
-  // const handleDeleteUser = (id) => {
-  //   setUsers(users.filter((user) => user._id !== id));
-  // };
-
   // Submit Handler (Create & Update)
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
     try {
       if (editingUser) {
-        // Update User API call
         const res = await fetch(`/api/auth/users/${editingUser._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -196,7 +160,6 @@ export default function ManageUsersPage() {
 
         setUsers(users.map((u) => (u._id === editingUser._id ? data : u)));
       } else {
-        // Create User API call
         const res = await fetch("/api/auth/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -224,7 +187,51 @@ export default function ManageUsersPage() {
     }
   };
 
-  // Role Badge Styling
+  // DataTable Filtering & Sorting Logic
+  const filteredAndSortedUsers = useMemo(() => {
+    return users
+      .filter((user) => {
+        const matchesSearch =
+          user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
+        const matchesStatus =
+          statusFilter === "ALL" ||
+          (statusFilter === "ACTIVE" ? user.active : !user.active);
+
+        return matchesSearch && matchesRole && matchesStatus;
+      })
+      .sort((a, b) => {
+        let valA = a[sortField];
+        let valB = b[sortField];
+
+        if (typeof valA === "string") {
+          valA = valA.toLowerCase();
+          valB = valB.toLowerCase();
+        }
+
+        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+  }, [users, searchQuery, roleFilter, statusFilter, sortField, sortOrder]);
+
+  // Paginated Data
+  const totalPages = Math.ceil(filteredAndSortedUsers.length / pageSize) || 1;
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredAndSortedUsers.slice(start, start + pageSize);
+  }, [filteredAndSortedUsers, currentPage]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
   const getRoleStyle = (role) => {
     switch (role) {
       case "ADMIN":
@@ -246,7 +253,8 @@ export default function ManageUsersPage() {
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-10 dark:bg-slate-950 text-slate-900 dark:text-slate-50 relative selection:bg-blue-500/10">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
+        
+        {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
@@ -262,6 +270,7 @@ export default function ManageUsersPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               className="inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 active:scale-95 transition-all text-slate-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 disabled:opacity-50"
+              title="Refresh Directory"
             >
               <svg
                 className={`w-5 h-5 ${isRefreshing ? "animate-spin text-blue-500" : ""}`}
@@ -300,135 +309,251 @@ export default function ManageUsersPage() {
           </div>
         </div>
 
+        {/* --- DATATABLE CONTROLS / FILTERS BAR --- */}
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3">
+          {/* Global Search Input */}
+          <div className="relative w-full md:w-80">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search by name or email..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-950 dark:border-slate-800 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          {/* Filter Dropdowns */}
+          <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+            <select
+              value={roleFilter}
+              onChange={(e) => {
+                setRoleFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-950 dark:border-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="ALL">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="USER">User</option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-950 dark:border-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="ACTIVE">Active Only</option>
+              <option value="DISABLED">Disabled Only</option>
+            </select>
+
+            {(searchQuery || roleFilter !== "ALL" || statusFilter !== "ALL") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setRoleFilter("ALL");
+                  setStatusFilter("ALL");
+                }}
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline px-2 py-1 whitespace-nowrap"
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* --- DESKTOP TABLE VIEW --- */}
         <div className="hidden md:block bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <th className="py-4 px-6">User Profile</th>
-                  <th className="py-4 px-6">Role</th>
-                  <th className="py-4 px-6">Status</th>
-                  <th className="py-4 px-6">Joined Date</th>
+                  <th 
+                    onClick={() => handleSort("name")}
+                    className="py-4 px-6 cursor-pointer hover:text-blue-600 transition-colors select-none"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>User Profile</span>
+                      {sortField === "name" && (
+                        <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort("role")}
+                    className="py-4 px-6 cursor-pointer hover:text-blue-600 transition-colors select-none"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Role</span>
+                      {sortField === "role" && (
+                        <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort("active")}
+                    className="py-4 px-6 cursor-pointer hover:text-blue-600 transition-colors select-none"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Status</span>
+                      {sortField === "active" && (
+                        <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort("createdAt")}
+                    className="py-4 px-6 cursor-pointer hover:text-blue-600 transition-colors select-none"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Joined Date</span>
+                      {sortField === "createdAt" && (
+                        <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                      )}
+                    </div>
+                  </th>
                   <th className="py-4 px-6 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70 text-sm">
-                {isLoading
-                  ? Array.from({ length: 3 }).map((_, idx) => (
-                      <tr key={idx} className="animate-pulse">
-                        <td className="py-4 px-6 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800" />
-                          <div className="space-y-2">
-                            <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
-                            <div className="h-3 w-24 bg-slate-100 dark:bg-slate-800/60 rounded" />
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-full" />
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="h-5 w-14 bg-slate-200 dark:bg-slate-800 rounded-full" />
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="h-4 w-20 bg-slate-200 dark:bg-slate-800 rounded" />
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="h-8 w-16 ml-auto bg-slate-200 dark:bg-slate-800 rounded-lg" />
-                        </td>
-                      </tr>
-                    ))
-                  : users.map((user) => (
-                      <tr
-                        key={user._id}
-                        className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200"
-                      >
-                        <td className="py-4 px-6 flex items-center gap-3">
-                          <img
-                            src={user.avatarUrl}
-                            alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 group-hover:scale-105 transition-transform"
+                {isLoading ? (
+                  Array.from({ length: 3 }).map((_, idx) => (
+                    <tr key={idx} className="animate-pulse">
+                      <td className="py-4 px-6 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800" />
+                        <div className="space-y-2">
+                          <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                          <div className="h-3 w-24 bg-slate-100 dark:bg-slate-800/60 rounded" />
+                        </div>
+                      </td>
+                      <td className="py-4 px-6"><div className="h-6 w-16 bg-slate-200 dark:bg-slate-800 rounded-full" /></td>
+                      <td className="py-4 px-6"><div className="h-5 w-14 bg-slate-200 dark:bg-slate-800 rounded-full" /></td>
+                      <td className="py-4 px-6"><div className="h-4 w-20 bg-slate-200 dark:bg-slate-800 rounded" /></td>
+                      <td className="py-4 px-6"><div className="h-8 w-16 ml-auto bg-slate-200 dark:bg-slate-800 rounded-lg" /></td>
+                    </tr>
+                  ))
+                ) : paginatedUsers.length > 0 ? (
+                  paginatedUsers.map((user) => (
+                    <tr
+                      key={user._id}
+                      className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200"
+                    >
+                      <td className="py-4 px-6 flex items-center gap-3">
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.name}
+                          className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100 dark:ring-slate-800 group-hover:scale-105 transition-transform"
+                        />
+                        <div>
+                          <span className="font-semibold text-slate-800 dark:text-slate-100 block group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {user.name}
+                          </span>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+                            {user.email}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getRoleStyle(user.role)}`}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span
+                          className={`inline-flex items-center gap-1.5 text-xs font-medium ${user.active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${user.active ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
                           />
-                          <div>
-                            <span className="font-semibold text-slate-800 dark:text-slate-100 block group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                              {user.name}
-                            </span>
-                            <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
-                              {user.email}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${getRoleStyle(user.role)}`}
+                          {user.active ? "Active" : "Disabled"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs">
+                        {formatDate(user.createdAt)}
+                      </td>
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleOpenEditModal(user)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all active:scale-90"
+                            title="Edit User"
                           >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span
-                            className={`inline-flex items-center gap-1.5 text-xs font-medium ${user.active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all active:scale-90"
+                            title="Delete User"
                           >
-                            <span
-                              className={`w-1.5 h-1.5 rounded-full ${user.active ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}
-                            />
-                            {user.active ? "Active" : "Disabled"}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-slate-500 dark:text-slate-400 text-xs">
-                          {formatDate(user.createdAt)}
-                        </td>
-                        <td className="py-4 px-6 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <button
-                              onClick={() => handleOpenEditModal(user)}
-                              className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all active:scale-90"
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUser(user._id)}
-                              className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all active:scale-90"
-                            >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-12 text-slate-400 text-sm">
+                      No matching user records found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
+
+          {/* DataTable Pagination Footer */}
+          {!isLoading && filteredAndSortedUsers.length > 0 && (
+            <div className="flex items-center justify-between px-6 py-3.5 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+              <div>
+                Showing <span className="font-semibold">{(currentPage - 1) * pageSize + 1}</span> to{" "}
+                <span className="font-semibold">{Math.min(currentPage * pageSize, filteredAndSortedUsers.length)}</span> of{" "}
+                <span className="font-semibold">{filteredAndSortedUsers.length}</span> results
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="font-medium px-1">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* --- MOBILE CARDS GRID VIEW --- */}
+        {/* --- MOBILE CARDS VIEW --- */}
         <div className="block md:hidden space-y-4">
-          {!isLoading &&
-            users.map((user) => (
+          {!isLoading && paginatedUsers.length > 0 ? (
+            paginatedUsers.map((user) => (
               <div
                 key={user._id}
                 className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 hover:shadow-md transition-all duration-200"
@@ -455,36 +580,16 @@ export default function ManageUsersPage() {
                       onClick={() => handleOpenEditModal(user)}
                       className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-all"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                        />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                       </svg>
                     </button>
                     <button
                       onClick={() => handleDeleteUser(user._id)}
                       className="p-2 rounded-xl text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
                   </div>
@@ -492,26 +597,16 @@ export default function ManageUsersPage() {
 
                 <div className="flex items-center justify-between text-xs border-t border-slate-100 dark:border-slate-800/60 pt-3">
                   <div>
-                    <span className="text-slate-400 dark:text-slate-500 block mb-1 font-medium">
-                      Role
-                    </span>
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full font-semibold border ${getRoleStyle(user.role)}`}
-                    >
+                    <span className="text-slate-400 dark:text-slate-500 block mb-1 font-medium">Role</span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-semibold border ${getRoleStyle(user.role)}`}>
                       {user.role}
                     </span>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-slate-400 dark:text-slate-500 block mb-1 font-medium">
-                      Status
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-1.5 font-medium ${user.active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${user.active ? "bg-emerald-500" : "bg-slate-400"}`}
-                      />
+                    <span className="text-slate-400 dark:text-slate-500 block mb-1 font-medium">Status</span>
+                    <span className={`inline-flex items-center gap-1.5 font-medium ${user.active ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${user.active ? "bg-emerald-500" : "bg-slate-400"}`} />
                       {user.active ? "Active" : "Disabled"}
                     </span>
                   </div>
@@ -521,27 +616,13 @@ export default function ManageUsersPage() {
                   Joined: {formatDate(user.createdAt)}
                 </div>
               </div>
-            ))}
+            ))
+          ) : !isLoading ? (
+            <div className="text-center py-12 text-slate-400 text-sm bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+              No matching profiles found.
+            </div>
+          ) : null}
         </div>
-
-        {/* Empty State */}
-        {!isLoading && users.length === 0 && (
-          <div className="text-center py-16 text-slate-400 dark:text-slate-500 space-y-2">
-            <svg
-              className="w-8 h-8 mx-auto stroke-current opacity-70"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <p className="font-medium text-sm">No registered profiles found.</p>
-          </div>
-        )}
       </div>
 
       {/* --- ADD / EDIT USER MODAL --- */}
@@ -556,18 +637,8 @@ export default function ManageUsersPage() {
                 onClick={() => setIsModalOpen(false)}
                 className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>

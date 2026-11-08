@@ -1,35 +1,52 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import toast from "react-hot-toast";
 
 const blogses = [
   {
+    _id: "65e9f1a2b8c1d23456789011",
     title: "Smart IoT Buildings",
     description:
       "How IoT sensors and AI are transforming modern building management systems.",
     image: "/images/IoT-smart.png",
-    date: "Apr 6, 2026",
     author: "Rabindra Sharma",
     category: "IoT",
     readTime: "5 min read",
     slug: "smart-iot-buildings",
     content: `Smart buildings use IoT sensors...`,
+    suspended: false,
+    createdAt: "2026-04-06T00:00:00.000Z",
   },
 ];
 
 export default function BlogsPage() {
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const [blogs, setBlogs] = useState(blogses);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
-  const [actionBlog, setActionBlog] = useState(null);
+  const [actionBlogId, setActionBlogId] = useState(null);
 
-  // 1. Create a reference for the file input element
+  // References
+  const menuRef = useRef(null);
   const imageInputRef = useRef(null);
 
-  // New Client Form State (Removed image here because files are handled via ref)
+  // DataTable Filtering, Searching, Sorting & Pagination State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  // Form State
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -39,20 +56,29 @@ export default function BlogsPage() {
     slug: "",
     content: "",
   });
-  // Added on 09/20/2026 for check sessions
+
   const [session, setSession] = useState(null);
   const [sessionLoading, setSessionLoading] = useState(true);
 
-  // Simulated Fluid Refresh Action
+  // Close action popover menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setActionBlogId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
-      // Re-trigger the initial fetch logic here if desired
+      toast.success("Blogs feed refreshed");
     }, 850);
   };
 
-  // Form Input Listener
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -76,7 +102,6 @@ export default function BlogsPage() {
 
     try {
       const frmData = new FormData();
-
       frmData.append("title", formData.title);
       frmData.append("description", formData.description);
       frmData.append("author", formData.author);
@@ -110,31 +135,19 @@ export default function BlogsPage() {
           (editingBlog ? "Blog updated successfully!" : "New blog added successfully!")
       );
 
+      const savedBlog = data.data || data;
+
       if (editingBlog) {
         setBlogs((prevBlogs) =>
           prevBlogs.map((blog) =>
-            blog._id === editingBlog._id ? data.data : blog
+            blog._id === editingBlog._id ? savedBlog : blog
           )
         );
       } else {
-        setBlogs((prevBlogs) => [data.data, ...prevBlogs]);
+        setBlogs((prevBlogs) => [savedBlog, ...prevBlogs]);
       }
 
-      setFormData({
-        title: "",
-        description: "",
-        author: "Mr. Rabindra Sharma",
-        category: "",
-        readTime: "",
-        slug: "",
-        content: "",
-      });
-
-      if (imageInputRef.current) imageInputRef.current.value = "";
-
-      setEditingBlog(null);
-      setActionBlog(null);
-      setIsModalOpen(false);
+      handleCloseModal();
     } catch (error) {
       console.error("Save blog error:", error);
       toast.error("Something went wrong!");
@@ -145,7 +158,6 @@ export default function BlogsPage() {
 
   const handleEdit = (blog) => {
     setEditingBlog(blog);
-
     setFormData({
       title: blog.title || "",
       description: blog.description || "",
@@ -157,14 +169,12 @@ export default function BlogsPage() {
     });
 
     if (imageInputRef.current) imageInputRef.current.value = "";
-
-    setActionBlog(null);
+    setActionBlogId(null);
     setIsModalOpen(true);
   };
 
   const handleNewBlog = () => {
     setEditingBlog(null);
-
     setFormData({
       title: "",
       description: "",
@@ -176,17 +186,14 @@ export default function BlogsPage() {
     });
 
     if (imageInputRef.current) imageInputRef.current.value = "";
-
-    setActionBlog(null);
+    setActionBlogId(null);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     if (isLoading) return;
-
     setIsModalOpen(false);
     setEditingBlog(null);
-
     setFormData({
       title: "",
       description: "",
@@ -196,25 +203,22 @@ export default function BlogsPage() {
       slug: "",
       content: "",
     });
-
     if (imageInputRef.current) imageInputRef.current.value = "";
   };
 
   const handleSuspend = async (blog) => {
     const nextSuspended = !Boolean(blog.suspended);
-
     const confirmed = window.confirm(
       nextSuspended ? `Suspend "${blog.title}"?` : `Unsuspend "${blog.title}"?`
     );
 
     if (!confirmed) {
-      setActionBlog(null);
+      setActionBlogId(null);
       return;
     }
 
     try {
       setIsLoading(true);
-
       const response = await fetch(`/api/blogs/${blog._id}/suspend`, {
         method: "PATCH",
         credentials: "include",
@@ -239,8 +243,7 @@ export default function BlogsPage() {
         )
       );
 
-      setActionBlog(null);
-
+      setActionBlogId(null);
       toast.success(
         data.message ||
           (nextSuspended
@@ -255,7 +258,54 @@ export default function BlogsPage() {
     }
   };
 
-// Check logged-in admin
+  // DataTable Filtering, Searching & Sorting Logic
+  const filteredAndSortedBlogs = useMemo(() => {
+    return blogs
+      .filter((blog) => {
+        const matchesSearch =
+          (blog.title && blog.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (blog.description && blog.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (blog.author && blog.author.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        const matchesCategory =
+          categoryFilter === "All" || blog.category === categoryFilter;
+        const matchesStatus =
+          statusFilter === "All" ||
+          (statusFilter === "Active" ? !blog.suspended : blog.suspended);
+
+        return matchesSearch && matchesCategory && matchesStatus;
+      })
+      .sort((a, b) => {
+        let valA = a[sortField] || "";
+        let valB = b[sortField] || "";
+
+        if (typeof valA === "string") {
+          valA = valA.toLowerCase();
+          valB = valB.toLowerCase();
+        }
+
+        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+  }, [blogs, searchQuery, categoryFilter, statusFilter, sortField, sortOrder]);
+
+  const totalPages = Math.ceil(filteredAndSortedBlogs.length / pageSize) || 1;
+  const paginatedBlogs = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredAndSortedBlogs.slice(start, start + pageSize);
+  }, [filteredAndSortedBlogs, currentPage]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+
+  // Check logged-in admin session
   useEffect(() => {
     const checkSession = async () => {
       try {
@@ -291,8 +341,13 @@ export default function BlogsPage() {
         const response = await fetch("/api/blogs");
         const result = await response.json();
 
-        if (result.success && result.data && result.data.length > 0) {
-          setBlogs(result.data);
+        let fetchedData = [];
+        if (Array.isArray(result)) fetchedData = result;
+        else if (Array.isArray(result.data)) fetchedData = result.data;
+        else if (Array.isArray(result.blogs)) fetchedData = result.blogs;
+
+        if (fetchedData.length > 0) {
+          setBlogs(fetchedData);
         }
       } catch (err) {
         console.error("API Fetch failed, using static fallback data:", err.message);
@@ -302,16 +357,22 @@ export default function BlogsPage() {
     }
 
     fetchBlogs();
-  }, [isRefreshing]); // Hooked to refresh trigger
- return (
-    <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 md:p-10 dark:bg-slate-950 text-slate-900 dark:text-slate-50 relative selection:bg-blue-500/10">
-      <div className="max-w-6xl mx-auto space-y-6">
+  }, [isRefreshing]);
+
+  if (!isMounted) {
+    return <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6">Loading dashboard...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50/50 p-3 sm:p-6 md:p-10 dark:bg-slate-950 text-slate-900 dark:text-slate-50 relative selection:bg-blue-500/10">
+      <div className="max-w-6xl mx-auto space-y-5">
+        
         {/* Navigation / Header Layout */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Manage Blogs</h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              Manage blogs at create, update and de-activate
+              Create, update, search, filter, and manage publication statuses
             </p>
           </div>
 
@@ -319,7 +380,8 @@ export default function BlogsPage() {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 active:scale-95 transition-all text-slate-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 disabled:opacity-50"
+              className="inline-flex items-center justify-center p-2.5 rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 active:scale-95 transition-all text-slate-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 disabled:opacity-50 shrink-0 cursor-pointer"
+              title="Refresh Feed"
             >
               <svg
                 className={`w-5 h-5 ${isRefreshing ? "animate-spin text-blue-500" : ""}`}
@@ -334,7 +396,7 @@ export default function BlogsPage() {
 
             <button
               onClick={handleNewBlog}
-              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-md active:scale-[0.98] transition-all flex-1 sm:flex-none"
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl shadow-md active:scale-[0.98] transition-all flex-1 sm:flex-none cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
@@ -344,19 +406,94 @@ export default function BlogsPage() {
           </div>
         </div>
 
+        {/* --- DATATABLE SEARCH & FILTER BAR --- */}
+        <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative w-full sm:w-80">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              placeholder="Search title, description..."
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-950 dark:border-slate-800 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <select
+              value={categoryFilter}
+              onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-950 dark:border-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 flex-1 sm:flex-none cursor-pointer"
+            >
+              <option value="All">All Categories</option>
+              <option value="IoT">IoT</option>
+              <option value="Technology">Technology</option>
+              <option value="AI & Data">AI & Data</option>
+            </select>
+
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/50 dark:bg-slate-950 dark:border-slate-800 text-xs font-medium focus:outline-none focus:border-blue-500 flex-1 sm:flex-none cursor-pointer"
+            >
+              <option value="All">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+
+            {(searchQuery || categoryFilter !== "All" || statusFilter !== "All") && (
+              <button
+                onClick={() => { setSearchQuery(""); setCategoryFilter("All"); setStatusFilter("All"); setCurrentPage(1); }}
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline px-2 py-1 cursor-pointer"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* --- DESKTOP STRUCTURED TABLE --- */}
-        <div className="hidden md:block bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="hidden md:block bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="overflow-x-auto overflow-y-visible min-h-[320px]">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  <th className="py-4 px-6">Title</th>
+                  <th onClick={() => handleSort("title")} className="py-4 px-6 cursor-pointer hover:text-blue-600 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <span>Title</span>
+                      {sortField === "title" && <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>}
+                    </div>
+                  </th>
                   <th className="py-4 px-6">Description</th>
-                  <th className="py-4 px-6">Author</th>
-                  <th className="py-4 px-6">Category</th>
-                  <th className="py-4 px-6">Status</th>
+                  <th onClick={() => handleSort("author")} className="py-4 px-6 cursor-pointer hover:text-blue-600 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <span>Author</span>
+                      {sortField === "author" && <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("category")} className="py-4 px-6 cursor-pointer hover:text-blue-600 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <span>Category</span>
+                      {sortField === "category" && <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("suspended")} className="py-4 px-6 cursor-pointer hover:text-blue-600 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <span>Status</span>
+                      {sortField === "suspended" && <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>}
+                    </div>
+                  </th>
                   <th className="py-4 px-6">Content</th>
-                  <th className="py-4 px-6">Date/Time</th>
+                  <th onClick={() => handleSort("createdAt")} className="py-4 px-6 cursor-pointer hover:text-blue-600 select-none">
+                    <div className="flex items-center gap-1.5">
+                      <span>Date/Time</span>
+                      {sortField === "createdAt" && <span className="text-blue-500">{sortOrder === "asc" ? "↑" : "↓"}</span>}
+                    </div>
+                  </th>
                   <th className="py-4 px-6 text-right">Actions</th>
                 </tr>
               </thead>
@@ -367,157 +504,239 @@ export default function BlogsPage() {
                       <td className="py-4 px-6 h-12 bg-slate-100/50 dark:bg-slate-800/40" colSpan={8}></td>
                     </tr>
                   ))
-                ) : (
-                  blogs.map((blog) => (
-                    <tr key={blog._id || blog.slug} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200">
-                      <td className="py-4 px-6 font-semibold">{blog.title}</td>
-                      <td className="py-4 px-6 truncate max-w-[180px]">{blog.description}</td>
-                      <td className="py-4 px-6 text-slate-500 dark:text-slate-400">{blog.author}</td>
-                      <td className="py-4 px-6 font-bold text-slate-800 dark:text-slate-200">{blog.category}</td>
-                      <td className="py-4 px-6 font-bold text-slate-800 dark:text-slate-200">{blog.suspended ? "Suspended" : "Active"}</td>
-                      <td className="py-4 px-6 truncate max-w-[200px]">{blog.content}</td>
-                      <td className="py-4 px-6 text-xs">{blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : "Just Now"}</td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="relative inline-block">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setActionBlog(
-                                actionBlog?._id === blog._id ? null : blog
-                              )
-                            }
-                            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 active:scale-95 transition-all"
-                            aria-label="Blog actions"
-                          >
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                            </svg>
-                          </button>
+                ) : paginatedBlogs.length > 0 ? (
+                  paginatedBlogs.map((blog) => {
+                    const rowKey = blog._id || blog.slug;
+                    const isMenuOpen = actionBlogId === rowKey;
 
-                          {actionBlog?._id === blog._id && (
-                            <div className="absolute right-0 top-10 z-30 w-44 rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                              <button
-                                type="button"
-                                onClick={() => handleEdit(blog)}
-                                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    return (
+                      <tr key={rowKey} className="group hover:bg-slate-50/60 dark:hover:bg-slate-800/20 transition-all duration-200 relative">
+                        <td className="py-4 px-6 font-semibold">{blog.title}</td>
+                        <td className="py-4 px-6 truncate max-w-[180px]">{blog.description}</td>
+                        <td className="py-4 px-6 text-slate-500 dark:text-slate-400">{blog.author}</td>
+                        <td className="py-4 px-6 font-bold text-slate-800 dark:text-slate-200">{blog.category}</td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${blog.suspended ? "bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"}`}>
+                            {blog.suspended ? "Suspended" : "Active"}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 truncate max-w-[200px]">{blog.content}</td>
+                        <td className="py-4 px-6 text-xs">{blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : "Just Now"}</td>
+                        <td className="py-4 px-6 text-right relative">
+                          <div className="relative inline-block">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActionBlogId(isMenuOpen ? null : rowKey);
+                              }}
+                              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 active:scale-95 transition-all cursor-pointer"
+                              aria-label="Blog actions"
+                            >
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                              </svg>
+                            </button>
+
+                            {isMenuOpen && (
+                              <div 
+                                ref={menuRef}
+                                onClick={(e) => e.stopPropagation()}
+                                className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-2xl dark:border-slate-700 dark:bg-slate-900"
                               >
-                                <span>✏️</span>
-                                Edit Blog
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleSuspend(blog)}
-                                disabled={isLoading}
-                                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${
-                                  blog.suspended
-                                    ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                                    : "text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
-                                } disabled:opacity-50`}
-                              >
-                                <span>{blog.suspended ? "▶️" : "⏸️"}</span>
-                                {blog.suspended ? "Unsuspend Blog" : "Suspend Blog"}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                                <button
+                                  type="button"
+                                  onClick={() => handleEdit(blog)}
+                                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                                >
+                                  <span>✏️</span>
+                                  Edit Blog
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSuspend(blog)}
+                                  disabled={isLoading}
+                                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium cursor-pointer ${
+                                    blog.suspended
+                                      ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                      : "text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                                  } disabled:opacity-50`}
+                                >
+                                  <span>{blog.suspended ? "▶️" : "⏸️"}</span>
+                                  {blog.suspended ? "Unsuspend Blog" : "Suspend Blog"}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="text-center py-12 text-slate-400 text-sm">
+                      No matching blog publications found.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {/* DataTable Pagination Footer */}
+          {!isLoading && filteredAndSortedBlogs.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3.5 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 gap-3">
+              <div>
+                Showing <span className="font-semibold">{(currentPage - 1) * pageSize + 1}</span> to{" "}
+                <span className="font-semibold">{Math.min(currentPage * pageSize, filteredAndSortedBlogs.length)}</span> of{" "}
+                <span className="font-semibold">{filteredAndSortedBlogs.length}</span> results
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 disabled:opacity-40 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Previous
+                </button>
+                <span className="font-medium px-1">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 disabled:opacity-40 hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* --- MOBILE CARDS FLUID GRID --- */}
-        <div className="block md:hidden space-y-4">
+        <div className="block md:hidden space-y-3">
           {isLoading ? (
             <div className="text-center py-6 animate-pulse text-sm">Loading posts...</div>
-          ) : (
-            blogs.map((blog) => (
-              <div key={blog._id || blog.slug} className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center text-white font-black text-xs uppercase shrink-0">
-                      {blog.title.substring(0, 2)}
-                    </div>
-                    <div className="min-w-0">
-                      <span className="font-bold text-slate-800 dark:text-slate-100 block text-base leading-tight truncate">{blog.title}</span>
-                      <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">{blog.category} • {blog.readTime}</span>
-                    </div>
-                  </div>
+          ) : paginatedBlogs.length > 0 ? (
+            paginatedBlogs.map((blog) => {
+              const rowKey = blog._id || blog.slug;
+              const isMenuOpen = actionBlogId === rowKey;
 
-                  <div className="relative shrink-0 ml-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setActionBlog(
-                          actionBlog?._id === blog._id ? null : blog
-                        )
-                      }
-                      className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      aria-label="Blog actions"
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-
-                    {actionBlog?._id === blog._id && (
-                      <div className="absolute right-0 top-10 z-30 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(blog)}
-                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
-                        >
-                          <span>✏️</span>
-                          Edit Blog
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSuspend(blog)}
-                          disabled={isLoading}
-                          className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${
-                            blog.suspended
-                              ? "text-emerald-600 hover:bg-emerald-50"
-                              : "text-red-600 hover:bg-red-50"
-                          } disabled:opacity-50`}
-                        >
-                          <span>{blog.suspended ? "▶️" : "⏸️"}</span>
-                          {blog.suspended ? "Unsuspend Blog" : "Suspend Blog"}
-                        </button>
+              return (
+                <div key={rowKey} className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm relative">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center text-white font-black text-xs uppercase shrink-0">
+                        {blog.title.substring(0, 2)}
                       </div>
-                    )}
+                      <div className="min-w-0">
+                        <span className="font-bold text-slate-800 dark:text-slate-100 block text-sm sm:text-base leading-tight truncate">{blog.title}</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">{blog.category} • {blog.readTime}</span>
+                      </div>
+                    </div>
+
+                    <div className="relative shrink-0 ml-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActionBlogId(isMenuOpen ? null : rowKey);
+                        }}
+                        className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                        aria-label="Blog actions"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                      </button>
+
+                      {isMenuOpen && (
+                        <div 
+                          ref={menuRef}
+                          onClick={(e) => e.stopPropagation()}
+                          className="absolute right-0 top-10 z-50 w-44 rounded-xl border border-slate-200 bg-white p-1.5 shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(blog)}
+                            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                          >
+                            <span>✏️</span>
+                            Edit Blog
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSuspend(blog)}
+                            disabled={isLoading}
+                            className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium cursor-pointer ${
+                              blog.suspended
+                                ? "text-emerald-600 hover:bg-emerald-50"
+                                : "text-red-600 hover:bg-red-50"
+                            } disabled:opacity-50`}
+                          >
+                            <span>{blog.suspended ? "▶️" : "⏸️"}</span>
+                            {blog.suspended ? "Unsuspend Blog" : "Suspend Blog"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{blog.description}</p>
+                  <div className="bg-slate-50/50 dark:bg-slate-950/40 p-2.5 rounded-xl flex flex-wrap gap-2 justify-between items-center text-xs text-slate-500">
+                    <span>Author: <b>{blog.author}</b></span>
+                    <span className={`font-semibold px-2 py-0.5 rounded-full ${blog.suspended ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}>
+                      {blog.suspended ? "Suspended" : "Active"}
+                    </span>
                   </div>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">{blog.description}</p>
-                <div className="bg-slate-50/50 dark:bg-slate-950/40 p-3 rounded-xl flex flex-wrap gap-2 justify-between text-xs text-slate-500">
-                  <span>Author: <b>{blog.author}</b></span>
-                  <span>{blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : "Just Now"}</span>
-                  <span className={`font-semibold ${blog.suspended ? "text-red-600" : "text-emerald-600"}`}>
-                    {blog.suspended ? "Suspended" : "Active"}
-                  </span>
-                </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-12 text-slate-400 text-sm bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+              No matching publications found.
+            </div>
+          )}
+
+          {/* Mobile Pagination */}
+          {!isLoading && filteredAndSortedBlogs.length > 0 && (
+            <div className="flex items-center justify-between px-2 pt-2 text-xs text-slate-500">
+              <span>Page {currentPage} of {totalPages}</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 disabled:opacity-40 cursor-pointer"
+                >
+                  Prev
+                </button>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 disabled:opacity-40 cursor-pointer"
+                >
+                  Next
+                </button>
               </div>
-            ))
+            </div>
           )}
         </div>
       </div>
 
       {/* --- MODAL DIALOG --- */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transform transition-all">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">{editingBlog ? "Edit Blog" : "New Blog"}</h3>
-              <button onClick={handleCloseModal} className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-50">{editingBlog ? "Edit Blog" : "New Blog"}</h3>
+              <button onClick={handleCloseModal} className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <form onSubmit={handleFormSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <form onSubmit={handleFormSubmit} className="p-5 space-y-3.5 max-h-[75vh] overflow-y-auto">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">Title</label>
                 <input
@@ -538,6 +757,7 @@ export default function BlogsPage() {
                   value={formData.description}
                   onChange={handleInputChange}
                   placeholder="Brief summary..."
+                  rows={2}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-transparent text-sm focus:outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950"
                   required
                 />
@@ -545,13 +765,12 @@ export default function BlogsPage() {
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">Banner/Image*</label>
-                {/* Fixed Controlled Element issue & linked the required Ref */}
                 <input
                   type="file"
                   name="image"
                   ref={imageInputRef}
                   accept="image/*"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white dark:bg-slate-950 text-sm focus:outline-none focus:border-blue-500 dark:border-slate-800"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white dark:bg-slate-950 text-sm focus:outline-none focus:border-blue-500 dark:border-slate-800 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-slate-100 dark:file:bg-slate-800 cursor-pointer"
                   required={!editingBlog}
                 />
                 {editingBlog && (
@@ -561,7 +780,7 @@ export default function BlogsPage() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">Author</label>
                   <input
@@ -588,7 +807,7 @@ export default function BlogsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 mb-1">Read/Time *</label>
                   <input
@@ -609,7 +828,7 @@ export default function BlogsPage() {
                     name="slug"
                     value={formData.slug}
                     onChange={handleInputChange}
-                    placeholder="e.g. unique-blog-slug"
+                    placeholder="e.g. unique-slug"
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-transparent text-sm focus:outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950"
                     required
                   />
@@ -622,24 +841,24 @@ export default function BlogsPage() {
                   name="content"
                   value={formData.content}
                   onChange={handleInputChange}
-                  rows={4}
+                  rows={3}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-transparent text-sm focus:outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950"
                   required
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800 transition-colors"
+                  className="px-4 py-2 text-sm font-semibold rounded-xl border border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Dismiss
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md active:scale-95 transition-all disabled:opacity-50"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {isLoading ? "Saving..." : editingBlog ? "Update Blog" : "Save Blog"}
                 </button>

@@ -7,7 +7,7 @@ const partners = [
   { id: 1, name: 'Tatsavi, Inc', logo: '☁️ Tatsavi, Inc' },
   { id: 2, name: 'VeiloScan', logo: '📊 VeiloScan' },
   { id: 3, name: 'Advika Innovate', logo: '🛡️ Advika Innovate' },
-  { id: 4, name: 'QuantumPay', logo: '💳 QuantumPay' },
+  { id: 4, name: 'RazorPay', logo: '💳 RazorPay' },
   { id: 5, name: 'DevOpsify', logo: '⚙️ DevOpsify' },
   { id: 6, name: 'InnoVenture', logo: '💡 InnoVenture' },
   { id: 7, name: 'AlphaNet', logo: '🌐 AlphaNet' },
