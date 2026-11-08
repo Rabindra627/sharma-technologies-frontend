@@ -1,6 +1,28 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Blog from "@/models/Blog";
+import { v2 as cloudinary } from "cloudinary";
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Helper function to upload buffer stream to Cloudinary
+const uploadToCloudinary = (fileBuffer, folder = "blogs") => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    uploadStream.end(fileBuffer);
+  });
+};
 
 export async function PUT(request, { params }) {
   try {
@@ -18,19 +40,19 @@ export async function PUT(request, { params }) {
       );
     }
 
-    const body = await request.json();
+    // 1. Parse FormData instead of request.json() to support image uploads
+    const formData = await request.formData();
 
-    const {
-      title,
-      description,
-      author,
-      category,
-      readTime,
-      slug,
-      content,
-    } = body;
+    const title = formData.get("title");
+    const description = formData.get("description");
+    const author = formData.get("author");
+    const category = formData.get("category");
+    const readTime = formData.get("readTime");
+    const slug = formData.get("slug");
+    const content = formData.get("content");
+    const imageFile = formData.get("image");
 
-    // Validate fields
+    // 2. Validate required text fields
     if (
       !title ||
       !description ||
@@ -49,11 +71,9 @@ export async function PUT(request, { params }) {
       );
     }
 
-    const normalizedSlug = slug
-      .toLowerCase()
-      .trim();
+    const normalizedSlug = slug.toLowerCase().trim();
 
-    // Check duplicate slug
+    // 3. Check duplicate slug
     const existingBlog = await Blog.findOne({
       slug: normalizedSlug,
       _id: { $ne: id },
@@ -63,14 +83,13 @@ export async function PUT(request, { params }) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "Another blog already uses this slug.",
+          message: "Another blog already uses this slug.",
         },
         { status: 400 }
       );
     }
 
-    // Find blog
+    // 4. Find blog
     const blog = await Blog.findById(id);
 
     if (!blog) {
@@ -83,7 +102,20 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Update fields
+    // 5. Handle Image Upload to Cloudinary if a new file was provided
+    let imageUrl = blog.image; // Keep existing image by default
+    if (imageFile && typeof imageFile === "object" && imageFile.size > 0) {
+      const bytes = await imageFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const cloudinaryResponse = await uploadToCloudinary(
+        buffer,
+        "sharma-technologies/blogs"
+      );
+      imageUrl = cloudinaryResponse.secure_url;
+    }
+
+    // 6. Update fields
     blog.title = title.trim();
     blog.description = description.trim();
     blog.author = author.trim();
@@ -91,6 +123,7 @@ export async function PUT(request, { params }) {
     blog.readTime = readTime.trim();
     blog.slug = normalizedSlug;
     blog.content = content.trim();
+    blog.image = imageUrl;
 
     await blog.save();
 
