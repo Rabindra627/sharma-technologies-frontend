@@ -17,12 +17,12 @@ export async function POST(req) {
 
     // MUST use smtp.titan.email here
     const transporter = nodemailer.createTransport({
-      host: "smtp.titan.email",
+      host: "mail.sharmatechnologies.com",
       port: 465,
       secure: true, // true for 465
       auth: {
-        user: process.env.EMAIL_USER, // e.g., info@sharmatechnologies.com
-        pass: process.env.EMAIL_PASS, // Your Titan email password
+        user: process.env.EMAIL_TO, // e.g., info@sharmatechnologies.com
+        pass: process.env.EMAIL_TO_PASS, // Your Titan email password
       },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
