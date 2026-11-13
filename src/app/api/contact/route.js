@@ -15,14 +15,14 @@ export async function POST(req) {
 
     await connectDB();
 
-    // MUST use smtp.titan.email here
+    // Configured for Titan Email (BigRock)
     const transporter = nodemailer.createTransport({
-      host: "mail.sharmatechnologies.com",
+      host: "smtp.titan.email",
       port: 465,
-      secure: true, // true for 465
+      secure: true, // true for port 465 (SSL/TLS)
       auth: {
-        user: process.env.EMAIL_TO, // e.g., info@sharmatechnologies.com
-        pass: process.env.EMAIL_TO_PASS, // Your Titan email password
+        user: process.env.EMAIL_USER, // e.g., info@sharmatechnologies.com
+        pass: process.env.EMAIL_PASS, // Your Titan email password
       },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
@@ -60,7 +60,7 @@ export async function POST(req) {
       transporter.sendMail({
         from: `"Sharma Technologies Notifications" <${process.env.EMAIL_USER}>`,
         replyTo: email,
-        to: process.env.EMAIL_TO || process.env.EMAIL_USER,
+        to: process.env.EMAIL_TO || process.env.EMAIL_USER, // Where admin notifications go
         subject: `[Inquiry] ${subject ? subject : "New Website Message"} - ${name}`,
         html: adminHtmlContent,
       }),
