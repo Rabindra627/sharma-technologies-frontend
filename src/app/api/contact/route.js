@@ -17,8 +17,8 @@ export async function POST(req) {
 
     // Configured for Titan Email (BigRock)
     const transporter = nodemailer.createTransport({
-      host: "smtp.titan.email",
-      port: 465,
+      host: process.env.EMAIL_HOST, // e.g., smtp.titan.email
+      port: process.env.EMAIL_PORT, // e.g., 465
       secure: true, // true for port 465 (SSL/TLS)
       auth: {
         user: process.env.EMAIL_USER, // e.g., info@sharmatechnologies.com
@@ -60,7 +60,7 @@ export async function POST(req) {
       transporter.sendMail({
         from: `"Sharma Technologies Notifications" <${process.env.EMAIL_USER}>`,
         replyTo: email,
-        to: process.env.EMAIL_TO || process.env.EMAIL_USER, // Where admin notifications go
+        to: process.env.EMAIL_USER, // Where admin notifications go
         subject: `[Inquiry] ${subject ? subject : "New Website Message"} - ${name}`,
         html: adminHtmlContent,
       }),
